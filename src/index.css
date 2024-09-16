@@ -1,0 +1,84 @@
+@import url("https://fonts.googleapis.com/css2?family=SUSE:wght@100..800&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: "SUSE", sans-serif;
+}
+
+@layer components {
+  .layoutContainerGrid {
+    display: grid;
+    grid-template-rows: 4.5rem 90vh;
+    grid-template-columns: 1fr 5fr;
+  }
+
+  .layoutContainerGrid .styledNavLinkSideBar {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: theme("colors.nav-text");
+    transition: 0.3s all;
+    padding: 0.2rem 2.4rem;
+    margin: 0 1rem;
+
+    &:hover,
+    &:active,
+    &.active:link,
+    &.active:visited {
+      background-color: theme("colors.background-grey");
+      border-radius: 10px;
+      color: theme("colors.nav-text-hover");
+    }
+
+    & svg {
+      width: 1.5rem;
+      height: 2.3rem;
+      color: theme("colors.navIcon");
+      transition: all 0.3s;
+    }
+
+    &:hover svg,
+    &:active svg,
+    &.active:link svg,
+    &.active:visited svg {
+      color: theme("colors.dark-yellow");
+    }
+  }
+
+  .styledNavLButtonHeader {
+    color: theme("colors.nav-text-hover");
+
+    transition: all 0.2s;
+
+    &:hover {
+      color: theme("colors.dark-yellow");
+      transform: scale(1.2);
+    }
+  }
+
+  .greenTag {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(187 247 208);
+    border-radius: 10%;
+    width: 50%;
+    height: 50%;
+    text-align: center;
+  }
+
+  .redTag {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(254 202 202);
+    border-radius: 10%;
+    width: 50%;
+    height: 50%;
+    text-align: center;
+  }
+}

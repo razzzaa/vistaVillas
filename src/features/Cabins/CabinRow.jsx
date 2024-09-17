@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Table from "../../ui/Table";
 import { HiMagnifyingGlassPlus } from "react-icons/hi2";
-import ImgModal from "../../ui/ImgModal";
+import Modal from "../../ui/Modal";
 
 function CabinRow({ cabin }) {
   const {
@@ -14,6 +14,13 @@ function CabinRow({ cabin }) {
     image,
   } = cabin;
 
+  function handleClick(e) {
+    const fam = e.target.closest("button").getBoundingClientRect();
+    console.log(fam);
+  }
+
+  function LargerImage() {}
+
   console.log(discount);
   return (
     <Table.Row>
@@ -23,7 +30,7 @@ function CabinRow({ cabin }) {
           src={`/cabins/${image}`}
         />
         <div className="absolute w-full h-full p-1">
-          <button className="z-50" onClick={() => alert("nahui")}>
+          <button onClick={handleClick}>
             <HiMagnifyingGlassPlus className="text-white text-xl hover:m-1 hover:scale-150 transition-all" />
           </button>
         </div>
@@ -32,7 +39,7 @@ function CabinRow({ cabin }) {
         {cabin_name}
       </div>
       <div className="flex justify-center items-center">{max_capacity}</div>
-      <div className="flex justify-center items-center">{price}</div>
+      <div className="flex justify-center items-center">₪{price}</div>
       <div className="flex justify-center items-center text-green-600 font-bold">
         {discount === null ? "---" : `₪${discount}`}
       </div>

@@ -1,9 +1,11 @@
 import { IoCloseCircleSharp } from "react-icons/io5";
-import { createContext } from "react";
+import { createContext, useState } from "react";
 
 const ModalContext = createContext();
 
 function Modal({ children }) {
+  const [openName, setOpenName] = useState("");
+
   return <ModalContext.Provider>{children}</ModalContext.Provider>;
 }
 

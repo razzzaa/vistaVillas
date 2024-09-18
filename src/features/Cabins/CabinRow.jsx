@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Table from "../../ui/Table";
 import { HiMagnifyingGlassPlus } from "react-icons/hi2";
+import Menus from "../../ui/Menus";
 import Modal from "../../ui/Modal";
 
 function CabinRow({ cabin }) {
@@ -12,6 +13,7 @@ function CabinRow({ cabin }) {
     discount,
     availability,
     image,
+    id,
   } = cabin;
 
   function handleClick(e) {
@@ -19,22 +21,25 @@ function CabinRow({ cabin }) {
     console.log(fam);
   }
 
-  function LargerImage() {}
-
   console.log(discount);
   return (
     <Table.Row>
-      <div className="relative h-16 min-w-16">
-        <img
-          className="rounded-lg aspect-[3/2] p-1 object-cover absolute h-full w-full"
-          src={`/cabins/${image}`}
-        />
-        <div className="absolute w-full h-full p-1">
-          <button onClick={handleClick}>
-            <HiMagnifyingGlassPlus className="text-white text-xl hover:m-1 hover:scale-150 transition-all" />
-          </button>
+      <Menus>
+        <div className="relative h-16 min-w-16">
+          <img
+            className="rounded-lg aspect-[3/2] p-1 object-cover absolute h-full w-full"
+            src={`/cabins/${image}`}
+          />
+          <div className="absolute w-full h-full p-1">
+            <Menus.Button
+              icon={
+                <HiMagnifyingGlassPlus className="text-white text-xl hover:m-1 hover:scale-150 transition-all" />
+              }
+              id={id}
+            ></Menus.Button>
+          </div>
         </div>
-      </div>
+      </Menus>
       <div className="flex justify-center items-center font-bold">
         {cabin_name}
       </div>

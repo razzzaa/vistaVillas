@@ -16,11 +16,13 @@ function Menus({ children }) {
   );
 }
 
-function Button({ children, icon, id }) {
+function Button({ children, icon, id, onClick }) {
   const { openId, close, open, position, setPosition } =
     useContext(MenusContext);
 
   function handleClick(e) {
+    onClick?.();
+    close?.();
     e.stopPropagation();
     const rect = e.target.closest("button").getBoundingClientRect();
     setPosition({

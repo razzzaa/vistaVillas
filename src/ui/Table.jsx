@@ -31,7 +31,7 @@ function Row({ children }) {
   const { columns } = useContext(TableContext);
   return (
     <div
-      className={`${columns} justify-center bg-white border-b text-md w-full h-full`}
+      className={`${columns} justify-center bg-white border-b text-sm w-full h-full`}
     >
       {children}
     </div>

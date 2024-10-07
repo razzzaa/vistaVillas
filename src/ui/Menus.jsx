@@ -1,4 +1,7 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { MdExpandMore } from "react-icons/md";
+import useOutsideClick from "../hooks/useOutsideClick";
 
 const MenusContext = createContext();
 
@@ -8,42 +11,84 @@ function Menus({ children }) {
 
   const close = () => setOpenId("");
   const open = setOpenId;
-
   return (
-    <MenusContext.Provider value={{ openId, close, open, setPosition }}>
+    <MenusContext.Provider
+      value={{ openId, close, open, position, setPosition }}
+    >
       {children}
     </MenusContext.Provider>
   );
 }
 
-function Button({ children, icon, id, onClick }) {
-  const { openId, close, open, position, setPosition } =
-    useContext(MenusContext);
+function Toggle({ id }) {
+  const { openId, close, open, setPosition, position } =
+    useContext(MenusContext) || {};
 
   function handleClick(e) {
-    onClick?.();
-    close?.();
     e.stopPropagation();
     const rect = e.target.closest("button").getBoundingClientRect();
+
     setPosition({
       x: window.innerWidth - rect.width - rect.x,
-      y: rect.y + rect.height + 8,
+      y: rect.y + rect.height + 2,
     });
     openId === "" || openId !== id ? open(id) : close();
-    console.log(openId);
-    console.log(rect);
+  }
+  console.log(openId);
+  return (
+    <button
+      onClick={handleClick}
+      className="transition-all hover:rotate-180 hover:text-dark-yellow"
+    >
+      <MdExpandMore />
+    </button>
+  );
+}
+
+function List({ id, children }) {
+  const { position, openId, close } = useContext(MenusContext);
+  const { x, y } = position || {};
+  const ref = useRef(null);
+  useOutsideClick(close, true, ref);
+  if (openId !== id) return null;
+
+  return createPortal(
+    <ul
+      ref={ref}
+      className="shadow-xl bg-white rounded-md p-2"
+      style={{
+        position: "fixed",
+        top: y ? `${y}px` : "0",
+        right: x ? `${x}px` : "0",
+      }}
+    >
+      {children}
+    </ul>,
+    document.body
+  );
+}
+
+function Button({ children, icon, onClick, styleBox, styleSpan }) {
+  const { close } = useContext(MenusContext);
+  function handleClick() {
+    onClick?.();
+    close();
   }
 
   return (
-    <>
+    <li className={styleBox}>
       <button onClick={handleClick}>
-        {icon}
-        {children ? <span>{children}</span> : ""}
+        <span className={styleSpan}>
+          {icon}
+          {children ? children : ""}
+        </span>
       </button>
-    </>
+    </li>
   );
 }
 
 Menus.Button = Button;
+Menus.Toggle = Toggle;
+Menus.List = List;
 
 export default Menus;

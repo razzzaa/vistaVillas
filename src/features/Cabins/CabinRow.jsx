@@ -66,7 +66,7 @@ function CabinRow({ cabin }) {
           <div className="text-2xl flex justify-end items-center p-4">
             <Menus.Toggle id={id} />
             <Menus.List id={id}>
-              <Modal.Open>
+              <Modal.Open opens={"edit"}>
                 <Menus.Button
                   styleBox={
                     "transition-all rounded-lg hover:bg-background-grey"
@@ -85,6 +85,7 @@ function CabinRow({ cabin }) {
               >
                 Duplicate
               </Menus.Button>
+
               <Menus.Button
                 styleBox={"transition-all rounded-lg hover:bg-background-grey"}
                 styleSpan={"flex items-center m-2 p-1"}
@@ -105,7 +106,7 @@ function CabinRow({ cabin }) {
 
           <Modal.Window name={"edit"}></Modal.Window>
 
-          <Modal.Window name={"edit"}></Modal.Window>
+          <Modal.Window name={"delete"}></Modal.Window>
         </Menus>
       </Modal>
     </Table.Row>

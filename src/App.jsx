@@ -7,6 +7,7 @@ import Settings from "./pages/Settings";
 import Bookings from "./pages/Bookings";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import GlobalStyles from "./styles/GlobalStyles";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,6 +22,7 @@ function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools />
+        <GlobalStyles />
         <BrowserRouter>
           <Routes>
             <Route element={<AppLayout />}>

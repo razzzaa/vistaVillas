@@ -38,7 +38,7 @@ function Toggle({ id }) {
   return (
     <button
       onClick={handleClick}
-      className="transition-all hover:rotate-180 hover:text-dark-yellow"
+      className="transition-all focus:rotate-180 hover:text-dark-yellow"
     >
       <MdExpandMore />
     </button>
@@ -79,8 +79,8 @@ function Button({ children, icon, onClick, styleBox, styleSpan }) {
     <li className={styleBox}>
       <button onClick={handleClick}>
         <span className={styleSpan}>
-          {icon}
-          {children ? children : ""}
+          <div>{icon}</div>
+          <div className="px-2">{children ? children : ""}</div>
         </span>
       </button>
     </li>

@@ -34,7 +34,6 @@ function Toggle({ id }) {
     });
     openId === "" || openId !== id ? open(id) : close();
   }
-  console.log(openId);
   return (
     <button
       onClick={handleClick}

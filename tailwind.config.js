@@ -12,6 +12,8 @@ export default {
         "background-dark": "#403D39",
         "nav-text": "#6b7280",
         "nav-text-hover": "#030712",
+        "green-button": "#0F9D58",
+        "red-button": "#DB4437",
         navIcon: "#a1a1aa",
       },
     },

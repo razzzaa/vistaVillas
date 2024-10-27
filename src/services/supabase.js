@@ -4,4 +4,4 @@ const supabaseKey = import.meta.env.VITE_REACT_APP_SUPABASE_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export default supabase;
+export { supabase, supabaseKey, supabaseUrl };

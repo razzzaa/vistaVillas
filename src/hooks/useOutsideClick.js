@@ -4,6 +4,9 @@ function useOutsideClick(handler, capturingPhase = true, ref) {
   useEffect(() => {
     function handleClick(e) {
       if (ref.current && !ref.current.contains(e.target)) {
+        console.log(ref);
+        console.log(ref.current);
+        console.log(e.target);
         handler();
       }
     }

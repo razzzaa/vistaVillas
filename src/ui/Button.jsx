@@ -1,9 +1,11 @@
-function Button({ icon, text, style }) {
+function Button({ icon, text, style, buttonContainer }) {
   return (
-    <button className={style}>
-      <span>{icon}</span>
-      <span className={text ? "px-2" : "px-0"}>{text ? text : ""}</span>
-    </button>
+    <div className={buttonContainer}>
+      <button className={style}>
+        <span>{icon}</span>
+        <span className={text ? "px-2" : "px-0"}>{text ? text : ""}</span>
+      </button>
+    </div>
   );
 }
 

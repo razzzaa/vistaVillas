@@ -6,13 +6,14 @@ import Menus from "../../ui/Menus";
 import { RiPlayListAddLine } from "react-icons/ri";
 import Modal from "../../ui/Modal";
 import Form from "../../ui/Form";
+import Heading from "../../ui/Heading";
 
 function CabinTable() {
   const { cabins, isLoading } = useCabins();
   return (
     <Modal>
       <Menus>
-        <Table columns="grid grid-cols-[1fr_1fr_2fr_1fr_2fr_2fr_1fr]">
+        <Table columns="grid grid-cols-[0.8fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr]">
           <Table.Header>
             <div></div>
             <div>CABIN</div>
@@ -20,6 +21,7 @@ function CabinTable() {
             <div>PRICE</div>
             <div>DISCOUNT</div>
             <div>AVAILABILITY</div>
+            <div>TOTAL</div>
             <div></div>
           </Table.Header>
           <Table.Body data={cabins}>
@@ -39,11 +41,15 @@ function CabinTable() {
             Add-Cabin
           </Menus.Button>
         </Modal.Open>
-        <Form>
-          <Modal.Window name={"addCabin"}>
-            <Form.Cabin />
-          </Modal.Window>
-        </Form>
+
+        <Modal.Window name={"addCabin"}>
+          <Form schemaType={"cabin"}>
+            <Form.Cabin
+              style={"bg-background-grey rounded-lg p-2"}
+              header={"Add-Cabin"}
+            />
+          </Form>
+        </Modal.Window>
       </Menus>
     </Modal>
   );

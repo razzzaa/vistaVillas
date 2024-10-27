@@ -1,4 +1,4 @@
-import supabase from "./supabase";
+import { supabase } from "./supabase";
 
 export async function getSettings() {
   const { data, error } = await supabase.from("settings").select("*").single();
@@ -6,7 +6,6 @@ export async function getSettings() {
     console.error(error);
     throw new Error("cannot load settings");
   }
-  console.log(data);
   return data;
 }
 
@@ -15,12 +14,14 @@ export async function updateSettings(newSettings) {
     .from("settings")
     .update(newSettings)
     .eq("id", 1)
-    .select();
+    .single();
 
   if (error) {
     console.error(error);
-    throw new Error("Settings could not be updated");
+    throw new Error("cannot update settings!");
   }
 
-  return data;
+  console.log(data);
+
+  return { data, error };
 }

@@ -7,7 +7,33 @@ const GlobalStyles = createGlobalStyle`
   list-style-type: none;
 }
 
+::-webkit-scrollbar {
+    width: 0.6rem;
+
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;;
+  margin: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--color-grey-300);
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-dark);
+}
+
 :root {
+    /* BUTTONS */
+--color-green-button: #0F9D58
+--color-red-button: #DB4437
+
 
   /* Grey */
   --color-grey-0: #fff;

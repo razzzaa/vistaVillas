@@ -4,10 +4,10 @@ import SideBar from "./SideBar";
 
 function AppLayout() {
   return (
-    <div className="layoutContainerGrid">
+    <div className="layoutContainerGrid ">
       <NavBar />
       <SideBar />
-      <main className="col-start-2 col-end-3 bg-background-grey p-8">
+      <main className="col-start-2 col-end-3 bg-background-grey p-8 overflow-auto">
         <div className="mx-28">
           <Outlet />
         </div>

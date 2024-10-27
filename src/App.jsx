@@ -8,6 +8,8 @@ import Bookings from "./pages/Bookings";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import GlobalStyles from "./styles/GlobalStyles";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +37,7 @@ function App() {
             </Route>
           </Routes>
         </BrowserRouter>
+        <ToastContainer />
       </QueryClientProvider>
     </>
   );

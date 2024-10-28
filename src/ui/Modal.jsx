@@ -48,7 +48,9 @@ function Window({ children, name }) {
         <button className="flex p-1 text-2xl transition-all hover:scale-110">
           <MdOutlineClose className="h-full" onClick={close} />
         </button>
-        <div>{children && cloneElement(children, { onCloseModal: close })}</div>
+        <div className="flex flex-col items-center">
+          {children && cloneElement(children, { onCloseModal: close })}
+        </div>
       </div>
     </div>,
     document.body

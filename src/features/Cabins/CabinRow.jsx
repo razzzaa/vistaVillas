@@ -127,7 +127,7 @@ function CabinRow({ cabin }) {
             <div className="flex">
               <img className="w-1/2 rounded-md m-1" src={`${image}`} />
               <div className="px-4 overflow-auto max-h-[50vh] max-w-[50vw]">
-                <h1 className="text-xl">Description:</h1>
+                <h1 className="text-2xl font-bold">Description:</h1>
                 <p className="break-words">{description}</p>
               </div>
             </div>

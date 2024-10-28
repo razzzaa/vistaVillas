@@ -4,6 +4,7 @@ import { FaHouseChimney } from "react-icons/fa6";
 import { HiHomeModern } from "react-icons/hi2";
 import { HiMiniUsers } from "react-icons/hi2";
 import { LuSettings2 } from "react-icons/lu";
+import { FaPeopleGroup } from "react-icons/fa6";
 
 function MainSideBarNav() {
   return (
@@ -19,6 +20,12 @@ function MainSideBarNav() {
           <NavLink to="/bookings" className="styledNavLinkSideBar">
             <IoCalendar />
             <span>Bookings</span>
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/guests" className="styledNavLinkSideBar">
+            <FaPeopleGroup />
+            <span>Guests</span>
           </NavLink>
         </li>
         <li>

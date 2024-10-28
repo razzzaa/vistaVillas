@@ -7,7 +7,11 @@ function Settings() {
     <>
       <Heading as="h3">Settings</Heading>
       <Form schemaType={"settings"}>
-        <Form.Settings style={"bg-white rounded-lg shadow-md p-3"} />
+        <Form.Settings
+          style={
+            "flex justify-center bg-white rounded-lg shadow-md p-3 w-[50vw]"
+          }
+        />
       </Form>
     </>
   );

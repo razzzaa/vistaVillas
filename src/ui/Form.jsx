@@ -63,9 +63,8 @@ function Form({
   duplicateData = {},
   onCloseModal,
 }) {
-  const { settings } = useSettings();
+  const { settings, isLoading } = useSettings();
   const { id: editId, ...editData } = duplicateData;
-  console.log(typeof settings?.maxGuestsPerBooking);
 
   //CABIN
   //........................................................................................................................
@@ -78,7 +77,6 @@ function Form({
       )
       .positive()
       .integer()
-      .lessThan(Number(settings?.maxGuestsPerBooking) + 1)
       .required("Maximum-Capacity is required"),
     price_per_night: yup
       .number()
@@ -95,18 +93,18 @@ function Form({
       )
       .positive()
       .integer()
-      .nullable()
       .test(
         "discountLessPrice",
         "Discount should be less than regular price",
         function (value) {
-          const price = this.parent.price; // Access the 'price' field from the form
+          const price = this.parent.price_per_night;
           if (value != null && price != null) {
-            return value < price; // Ensure discount is less than price
+            return value < price;
           }
           return true;
         }
-      ),
+      )
+      .nullable(),
     description: yup.string().nullable(),
     availability: yup
       .boolean()
@@ -182,7 +180,27 @@ function Form({
     if (schemaTypes[schemaType]) {
       setSchema(schemaTypes[schemaType]);
     }
-  }, [schemaType]);
+    if (schemaType === "cabin" && !isLoading && settings?.maxGuestsPerBooking) {
+      setSchema(
+        cabinSchema.shape({
+          max_capacity: yup
+            .number()
+            .transform((value, originalValue) =>
+              originalValue === "" ? undefined : value
+            )
+            .positive()
+            .integer()
+            .lessThan(
+              Number(settings?.maxGuestsPerBooking) + 1,
+              `Maximum-Capacity must be less than ${
+                settings?.maxGuestsPerBooking + 1
+              }`
+            )
+            .required("Maximum-Capacity is required"),
+        })
+      );
+    }
+  }, [schemaType, isLoading, settings]);
 
   const {
     register,
@@ -194,6 +212,8 @@ function Form({
     defaultValues: isEdited ? editData : {},
   });
 
+  if (isLoading) return <Spinner />;
+
   return (
     <FormContext.Provider
       value={{
@@ -203,24 +223,16 @@ function Form({
         isEdited,
         editId,
         onCloseModal,
-        getValues,
       }}
     >
-      <div>{children}</div>
+      <div className="h-[vh70] overflow-auto">{children}</div>
     </FormContext.Provider>
   );
 }
 
 function Cabin({ style, header }) {
-  const {
-    register,
-    handleSubmit,
-    errors,
-    isEdited,
-    editId,
-    onCloseModal,
-    getValues,
-  } = useContext(FormContext);
+  const { register, handleSubmit, errors, isEdited, editId, onCloseModal } =
+    useContext(FormContext);
   const { addCabins, isUpdating } = useAddCabin();
   const { editCabin, isPending } = useEditCabins();
 

@@ -1,5 +1,11 @@
+import Heading from "../ui/Heading";
+
 function Home() {
-  return <div>Home</div>;
+  return (
+    <div>
+      <Heading as="h3">Home-Panel</Heading>
+    </div>
+  );
 }
 
 export default Home;

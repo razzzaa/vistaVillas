@@ -8,7 +8,6 @@ function Cabins() {
         <Heading as="h3">All Cabins</Heading>
         <CabinTable />
       </div>
-      <div></div>
     </>
   );
 }

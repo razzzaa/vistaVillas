@@ -10,6 +10,7 @@ import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Form from "../../ui/Form";
 import useAddCabin from "./useAddCabin";
+import { MdExpandMore } from "react-icons/md";
 
 function CabinRow({ cabin }) {
   const { addCabins, isUpdating } = useAddCabin();
@@ -36,7 +37,7 @@ function CabinRow({ cabin }) {
     <Table.Row>
       <Modal>
         <Menus>
-          <div className="relative h-16 min-w-16">
+          <div className="relative h-15S min-w-16">
             <img
               className="rounded-lg aspect-[3/2] p-1 object-cover absolute h-full w-full"
               src={`${image}`}
@@ -86,7 +87,7 @@ function CabinRow({ cabin }) {
           </div>
 
           <div className="text-2xl flex justify-end items-center p-4">
-            <Menus.Toggle id={id} />
+            <Menus.Toggle icon={<MdExpandMore />} id={id} />
             <Menus.List id={id}>
               <Modal.Open opens={"edit"}>
                 <Menus.Button
@@ -134,7 +135,7 @@ function CabinRow({ cabin }) {
           </Modal.Window>
 
           <Modal.Window name={"delete"}>
-            <ConfirmDelete cabinName={cabin_name} id={id} />
+            <ConfirmDelete name={cabin_name} id={id} action={"cab"} />
           </Modal.Window>
 
           <Modal.Window name={"edit"}>

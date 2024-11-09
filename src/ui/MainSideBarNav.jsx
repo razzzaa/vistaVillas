@@ -23,15 +23,15 @@ function MainSideBarNav() {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/guests" className="styledNavLinkSideBar">
-            <FaPeopleGroup />
-            <span>Guests</span>
-          </NavLink>
-        </li>
-        <li>
           <NavLink to="/cabins" className="styledNavLinkSideBar">
             <HiHomeModern />
             <span>Cabins</span>
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/guests" className="styledNavLinkSideBar">
+            <FaPeopleGroup />
+            <span>Guests</span>
           </NavLink>
         </li>
         <li>

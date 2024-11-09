@@ -20,7 +20,7 @@ function Menus({ children }) {
   );
 }
 
-function Toggle({ id }) {
+function Toggle({ id, icon }) {
   const { openId, close, open, setPosition, position } =
     useContext(MenusContext) || {};
 
@@ -39,7 +39,7 @@ function Toggle({ id }) {
       onClick={handleClick}
       className="transition-all focus:rotate-180 hover:text-dark-yellow"
     >
-      <MdExpandMore />
+      {icon}
     </button>
   );
 }

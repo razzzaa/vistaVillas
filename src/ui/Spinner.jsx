@@ -1,22 +1,23 @@
 import styled, { keyframes } from "styled-components";
 
 const rotate = keyframes`
-  to {
-    transform: rotate(1turn)
-  }
+0% {
+  transform: rotate(0deg);
+}
+100%{
+    transform: rotate(360deg);
+
+}
 `;
 
-const Spinner = styled.div`
-  margin: 4.8rem auto;
-
-  width: 6.4rem;
-  aspect-ratio: 1;
+const SpinnerMain = styled.div`
+  width: 10vh;
+  height: 10vh;
   border-radius: 50%;
-  background: radial-gradient(farthest-side, var(--color-brand-600) 94%, #0000)
-      top/10px 10px no-repeat,
-    conic-gradient(#0000 30%, var(--color-brand-600));
-  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 10px), #000 0);
-  animation: ${rotate} 1.5s infinite linear;
+  border: solid 0.7rem var(--color-brand-dark);
+  border-left: solid 0.7rem var(--color-grey-100);
+  opacity: 0.8;
+  animation: ${rotate} 1.2s infinite linear;
 `;
 
-export default Spinner;
+export default SpinnerMain;

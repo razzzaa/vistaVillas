@@ -12,6 +12,11 @@ import { MdAddBusiness } from "react-icons/md";
 import Heading from "./Heading";
 import useAddCabin from "../features/Cabins/useAddCabin";
 import useEditCabins from "../features/Cabins/useEditCabins";
+import acceptedFlags from "../utils/acceptedFlags";
+import { FaUserPlus } from "react-icons/fa6";
+import useAddGuests from "../features/Guests/useAddGuests";
+import useEditGuests from "../features/Guests/useEditGuests";
+import { MdSaveAs } from "react-icons/md";
 
 const FormContext = createContext();
 
@@ -64,7 +69,13 @@ function Form({
   onCloseModal,
 }) {
   const { settings, isLoading } = useSettings();
+
+  console.log(duplicateData);
+
   const { id: editId, ...editData } = duplicateData;
+  //   const correctedDuplicateData
+  console.log(editData);
+  console.log(editId);
 
   //CABIN
   //........................................................................................................................
@@ -172,7 +183,27 @@ function Form({
       .required(),
   });
 
-  const schemaTypes = { cabin: cabinSchema, settings: settingsSchema };
+  //GUESTS
+  //........................................................................................................................
+  const guestsSchema = yup.object({
+    fullName: yup.string().required("Full-Name is required"),
+    email: yup.string().email().required("Email is required"),
+    nationalId: yup
+      .number()
+      .transform((value, originalValue) =>
+        originalValue === "" ? undefined : value
+      )
+      .positive()
+      .integer()
+      .required("National-ID is required"),
+    country: yup.string().required("Country is a required field"),
+  });
+
+  const schemaTypes = {
+    cabin: cabinSchema,
+    settings: settingsSchema,
+    guests: guestsSchema,
+  };
 
   const [schema, setSchema] = useState(schemaType);
 
@@ -225,7 +256,7 @@ function Form({
         onCloseModal,
       }}
     >
-      <div className="h-[vh70] overflow-auto">{children}</div>
+      <div className="max-h-[80vh] overflow-auto">{children}</div>
     </FormContext.Provider>
   );
 }
@@ -270,7 +301,6 @@ function Cabin({ style, header }) {
               id="name"
               type="text"
               {...register("cabin_name")}
-              defaultValue={""}
             />
             <p className="text-red-500">{errors.cabin_name?.message}</p>
           </StyledFormLi>
@@ -334,8 +364,8 @@ function Cabin({ style, header }) {
         </StyledFormUl>
         <Button
           buttonContainer={"flex justify-center"}
-          text={"Add"}
-          icon={<MdAddBusiness />}
+          text={isEdited ? "SAVE" : "ADD"}
+          icon={isEdited ? <MdSaveAs /> : <MdAddBusiness />}
           style={
             "flex justify-center items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md w-6/12"
           }
@@ -366,67 +396,168 @@ function Settings({ style }) {
   if (isLoading) return <Spinner />;
 
   return (
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className={style}>
+          <StyledFormUl>
+            <StyledFormLi>
+              <label htmlFor="minNights">Minimum-Nights/Booking : </label>
+              <StyledFormInput
+                type="number"
+                defaultValue={minBookingLength}
+                id="minNights"
+                {...register("minBookingLength")}
+              />
+              <p className="text-red-500">{errors.minBookingLength?.message}</p>
+            </StyledFormLi>
+
+            <StyledFormLi>
+              <label htmlFor="maxNights">Maximum-Nights/Booking : </label>
+              <StyledFormInput
+                type="number"
+                defaultValue={maxBookingLength}
+                id="maxNights"
+                {...register("maxBookingLength")}
+              />
+              <p className="text-red-500">{errors.maxBookingLength?.message}</p>
+            </StyledFormLi>
+
+            <StyledFormLi>
+              <label htmlFor="maxGuests">Maximum-Guest/Booking : </label>
+              <StyledFormInput
+                type="number"
+                defaultValue={maxGuestsPerBooking}
+                id="maxGuests"
+                {...register("maxGuestsPerBooking")}
+              />
+              <p className="text-red-500">
+                {errors.maxGuestsPerBooking?.message}
+              </p>
+            </StyledFormLi>
+
+            <StyledFormLi>
+              <label htmlFor="breakfastPrice">Breakfst-Price :</label>
+              <StyledFormInput
+                defaultValue={breakfastPrice}
+                id="breakfastPrice"
+                {...register("breakfastPrice")}
+              />
+              <p className="text-red-500">{errors.breakfastPrice?.message}</p>
+            </StyledFormLi>
+          </StyledFormUl>
+        </div>
+        <Button
+          text={"Save"}
+          icon={<BsFillFloppy2Fill />}
+          style={
+            "flex items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md"
+          }
+        />
+      </form>
+    </>
+  );
+}
+
+function Guests({ style, header }) {
+  const flags = acceptedFlags();
+  const { addGuests, isUpdating } = useAddGuests();
+  const { editGuest, isPending } = useEditGuests();
+  const { register, handleSubmit, errors, isEdited, editId, onCloseModal } =
+    useContext(FormContext);
+
+  const onSubmit = (data) => {
+    const first = data.country.split(" : ");
+    const country = first[1];
+    const countryFlag = first[0];
+    console.log(country);
+    console.log(countryFlag);
+
+    if (isEdited) {
+      editGuest(
+        {
+          newCabinData: { ...data, country: country, countryFlag: countryFlag },
+          id: editId,
+        },
+        {
+          onSuccess: () => {
+            onCloseModal?.();
+          },
+        }
+      );
+    } else {
+      addGuests(
+        {
+          ...data,
+          country: country,
+          countryFlag: countryFlag,
+        },
+        {
+          onSuccess: () => {
+            onCloseModal?.();
+          },
+        }
+      );
+    }
+  };
+
+  return (
     <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="flex justify-center">
+        <Heading as="h3">{header}</Heading>
+      </div>
       <div className={style}>
         <StyledFormUl>
           <StyledFormLi>
-            <label htmlFor="minNights">Minimum-Nights/Booking : </label>
+            <label htmlFor="name">Full-Name : </label>
+            <StyledFormInput id="name" type="text" {...register("fullName")} />
+            <p className="text-red-500">{errors.fullName?.message}</p>
+          </StyledFormLi>
+          <StyledFormLi>
+            <label htmlFor="email">Email : </label>
+            <StyledFormInput type="email" id="email" {...register("email")} />
+            <p className="text-red-500">{errors.email?.message}</p>
+          </StyledFormLi>
+          <StyledFormLi>
+            <label htmlFor="id">National-ID : </label>
             <StyledFormInput
               type="number"
-              defaultValue={minBookingLength}
-              id="minNights"
-              {...register("minBookingLength")}
+              id="id"
+              {...register("nationalId")}
             />
-            <p className="text-red-500">{errors.minBookingLength?.message}</p>
+            <p className="text-red-500">{errors.nationalId?.message}</p>
           </StyledFormLi>
-
           <StyledFormLi>
-            <label htmlFor="maxNights">Maximum-Nights/Booking : </label>
-            <StyledFormInput
-              type="number"
-              defaultValue={maxBookingLength}
-              id="maxNights"
-              {...register("maxBookingLength")}
-            />
-            <p className="text-red-500">{errors.maxBookingLength?.message}</p>
+            <label htmlFor="name">Country : </label>
+            <StyledSelect id="availability" {...register("country")}>
+              <option className="text-center" value="">
+                --Please choose a country--
+              </option>
+              {Object.entries(flags).map(([code, name]) => (
+                <option key={code} value={`${code} : ${name}`}>
+                  {`${code} : ${name}`}
+                </option>
+              ))}
+            </StyledSelect>
+            <p className="text-red-500">{errors.country?.message}</p>
           </StyledFormLi>
-
-          <StyledFormLi>
-            <label htmlFor="maxGuests">Maximum-Guest/Booking : </label>
-            <StyledFormInput
-              type="number"
-              defaultValue={maxGuestsPerBooking}
-              id="maxGuests"
-              {...register("maxGuestsPerBooking")}
-            />
-            <p className="text-red-500">
-              {errors.maxGuestsPerBooking?.message}
-            </p>
-          </StyledFormLi>
-
-          <StyledFormLi>
-            <label htmlFor="breakfastPrice">Breakfst-Price :</label>
-            <StyledFormInput
-              defaultValue={breakfastPrice}
-              id="breakfastPrice"
-              {...register("breakfastPrice")}
-            />
-            <p className="text-red-500">{errors.breakfastPrice?.message}</p>
-          </StyledFormLi>
+          <Button
+            buttonContainer={"flex justify-center"}
+            text={isEdited ? "SAVE" : "ADD"}
+            icon={isEdited ? <MdSaveAs /> : <FaUserPlus />}
+            style={
+              "flex justify-center items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md w-6/12"
+            }
+          />
         </StyledFormUl>
       </div>
-      <Button
-        text={"Save"}
-        icon={<BsFillFloppy2Fill />}
-        style={
-          "flex items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md"
-        }
-      />
     </form>
   );
 }
 
+/* <img src={`https://flagsapi.com/${countryFlag}/shiny/24.png/`} />; */
+
 Form.Cabin = Cabin;
 Form.Settings = Settings;
+Form.Guests = Guests;
 
 export default Form;

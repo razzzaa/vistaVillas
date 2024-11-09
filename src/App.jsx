@@ -32,8 +32,8 @@ function App() {
               <Route index element={<Navigate replace to="home" />} />
               <Route path="home" element={<Home />} />
               <Route path="bookings" element={<Bookings />} />
-              <Route path="guests" element={<Guests />} />
               <Route path="cabins" element={<Cabins />} />
+              <Route path="guests" element={<Guests />} />
               <Route path="users" element={<Users />} />
               <Route path="settings" element={<Settings />} />
             </Route>

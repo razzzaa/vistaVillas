@@ -7,9 +7,13 @@ import { RiPlayListAddLine } from "react-icons/ri";
 import Modal from "../../ui/Modal";
 import Form from "../../ui/Form";
 import Heading from "../../ui/Heading";
+import SpinnerMain from "../../ui/Spinner";
 
 function CabinTable() {
   const { cabins, isLoading } = useCabins();
+
+  if (isLoading) return <SpinnerMain />;
+
   return (
     <Modal>
       <Menus>
@@ -45,7 +49,7 @@ function CabinTable() {
         <Modal.Window name={"addCabin"}>
           <Form schemaType={"cabin"}>
             <Form.Cabin
-              style={"bg-background-grey rounded-lg p-2"}
+              style={"bg-background-grey rounded-lg p-1"}
               header={"Add-Cabin"}
             />
           </Form>

@@ -6,7 +6,7 @@ function useAddCabin() {
   const queryClient = useQueryClient();
 
   const { mutate: addCabins, isPending: isUpdating } = useMutation({
-    mutationFn: apiAddCabins,
+    mutationFn: (newCabinData) => apiAddCabins(newCabinData),
     onSuccess: () => {
       toast.success("Cabin Added");
       queryClient.invalidateQueries({ queryKey: ["cabins"] });

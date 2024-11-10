@@ -15,7 +15,7 @@ function Table({ children, columns }) {
 function Header({ children }) {
   const { columns } = useContext(TableContext);
   return (
-    <div className={`${columns} font-bold text-center border-b px-1 py-2`}>
+    <div className={`${columns} font-bold text-center border-b px-1 py-3`}>
       {children}
     </div>
   );

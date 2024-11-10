@@ -69,7 +69,7 @@ function GuestsRow({ guest, index }) {
           </Modal.Window>
 
           <Modal.Window name={"delete"}>
-            <ConfirmDelete cabinName={fullName} id={id} action="guest" />
+            <ConfirmDelete name={fullName} id={id} action="guest" />
           </Modal.Window>
         </Menus>
       </Modal>

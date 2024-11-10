@@ -1,0 +1,55 @@
+import { supabase, supabaseUrl, supabaseKey } from "./supabase";
+
+export async function getBookings() {
+  const { data, error } = await supabase.from("bookings").select("*");
+  if (error) {
+    console.error(error);
+  } else {
+    console.log(data);
+  }
+  return data;
+}
+
+export async function addEditBookings(newBooking, id) {
+  if (!id) {
+    console.log("no id");
+    console.log(newBooking);
+    const { data: booking, error } = await supabase
+      .from("bookings")
+      .insert({ ...newBooking })
+      .select()
+      .single();
+    console.log(booking);
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("success", booking);
+    }
+  }
+
+  if (id) {
+    console.log("there is an id");
+    console.log(id);
+    const { data: booking, error } = await supabase
+      .from("bookings")
+      .update({ ...newBooking })
+      .eq("id", id)
+      .select();
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("success", booking);
+      console.log(booking);
+    }
+  }
+}
+
+export async function deleteGuest(id) {
+  const { error } = await supabase.from("bookings").delete().eq("id", id);
+  if (error) {
+    console.error(error);
+    throw new Error("Cannot delete booking");
+  } else {
+    console.log("success motherfucka!");
+  }
+}

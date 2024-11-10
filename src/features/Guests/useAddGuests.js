@@ -8,12 +8,12 @@ function useAddGuests() {
   const { mutate: addGuests, isPending: isUpdating } = useMutation({
     mutationFn: apiAddGuests,
     onSuccess: () => {
-      toast.success("Cabin Added");
+      toast.success("Guest-Added");
       queryClient.invalidateQueries({ queryKey: ["guests"] });
     },
     onError: (err) => {
       console.error(err.message);
-      toast.error("Unable To Add Cabin");
+      toast.error("Unable To Add Guest");
     },
   });
   return { addGuests, isUpdating };

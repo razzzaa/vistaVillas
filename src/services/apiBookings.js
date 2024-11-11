@@ -1,12 +1,20 @@
 import { supabase, supabaseUrl, supabaseKey } from "./supabase";
 
 export async function getBookings() {
-  const { data, error } = await supabase.from("bookings").select("*");
+  const { data, error } = await supabase.from("bookings").select(
+    `id, created_at, startDate, endDate, numNights, numGuests, extraPrice, status, hasBreakfast, observation,
+      cabins(price_per_night, discount, availability, cabin_name),
+      bookings_guests (
+        guests (id, fullName, email, country, countryFlag)
+      )`
+  );
+
   if (error) {
-    console.error(error);
+    console.error("Error fetching bookings:", error);
   } else {
-    console.log(data);
+    console.log("Fetched bookings data:", data);
   }
+
   return data;
 }
 

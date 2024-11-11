@@ -5,6 +5,7 @@ import { useBookings } from "./useBookings.js";
 
 function BookingTable() {
   const { bookings, isLoading } = useBookings();
+  console.log(bookings);
 
   if (isLoading) return <SpinnerMain />;
 
@@ -19,9 +20,9 @@ function BookingTable() {
         <div></div>
       </Table.Header>
       <Table.Body data={bookings}>
-        {bookings?.map((booking) => {
-          <BookingRow booking={booking} />;
-        })}
+        {bookings?.map((booking) => (
+          <BookingRow key={booking.id} booking={booking} />
+        ))}
       </Table.Body>
     </Table>
   );

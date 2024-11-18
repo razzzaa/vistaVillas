@@ -122,6 +122,7 @@ img {
     display: grid;
     grid-template-rows: 4.5rem 90vh;
     grid-template-columns: 0.85fr 5fr;
+
   }
 
   .layoutContainerGrid .styledNavLinkSideBar {

@@ -10,10 +10,10 @@ function BookingTable() {
   if (isLoading) return <SpinnerMain />;
 
   return (
-    <Table columns="grid grid-cols-[1fr_3fr_3fr_2fr_2fr_1fr]">
+    <Table columns="grid grid-cols-[1fr_3fr_3fr_1fr_1fr_1fr]">
       <Table.Header>
         <div>CABIN</div>
-        <div>GUEST</div>
+        <div>GUESTS</div>
         <div>DATE</div>
         <div>STATUS</div>
         <div>AMOUNT</div>

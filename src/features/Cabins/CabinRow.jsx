@@ -11,6 +11,7 @@ import ConfirmDelete from "../../ui/ConfirmDelete";
 import Form from "../../ui/Form";
 import useAddCabin from "./useAddCabin";
 import { MdExpandMore } from "react-icons/md";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 function CabinRow({ cabin }) {
   const { addCabins, isUpdating } = useAddCabin();
@@ -58,9 +59,7 @@ function CabinRow({ cabin }) {
           </div>
 
           <div className="flex justify-center items-center">{max_capacity}</div>
-          <div className="flex justify-center items-center font-bold">
-            ₪{price}
-          </div>
+          <div className="flex justify-center items-center">₪{price}</div>
 
           <div
             className={`flex justify-center items-center ${
@@ -82,8 +81,8 @@ function CabinRow({ cabin }) {
             </div>
           </div>
 
-          <div className="flex justify-center items-center text-green-600 font-bold">
-            {`₪${discount ? price - Math.abs(discount) : price}`}
+          <div className="flex justify-center items-center font-bold">
+            {formatCurrency(discount ? price - Math.abs(discount) : price)}
           </div>
 
           <div className="text-2xl flex justify-end items-center p-4">

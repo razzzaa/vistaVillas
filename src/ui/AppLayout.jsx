@@ -8,8 +8,8 @@ function AppLayout() {
     <div className="layoutContainerGrid ">
       <NavBar />
       <SideBar />
-      <main className="col-start-2 col-end-3 bg-background-grey p-6 overflow-auto">
-        <div className="mx-28">
+      <main className="grid justify-center col-start-2 col-end-3 bg-background-grey p-6 overflow-auto">
+        <div className="w-[80vw]">
           <Outlet />
         </div>
       </main>

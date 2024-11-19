@@ -2,10 +2,9 @@ import { supabase, supabaseUrl, supabaseKey } from "./supabase";
 
 export async function getBookings() {
   const { data, error } = await supabase.from("bookings").select(
-    `id, created_at, startDate, endDate, numNights, numGuests, extraPrice, status, hasBreakfast, observation,
+    `id, created_at, startDate, endDate, numNights, numGuests, extraPrice, status, observation,
       cabins(price_per_night, discount, availability, cabin_name),
-      bookings_guests (
-        guests (id, fullName, email, country, countryFlag)
+      bookings_guests (hasBreakfast, guests (id, fullName, email, country, countryFlag)
       )`
   );
 

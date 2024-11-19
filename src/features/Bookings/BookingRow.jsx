@@ -5,10 +5,12 @@ import Table from "../../ui/Table";
 import { HiOutlineArrowNarrowRight } from "react-icons/hi";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { BsArrowsAngleExpand } from "react-icons/bs";
+import { MdCloseFullscreen } from "react-icons/md";
 
 function BookingRow({ booking }) {
   const [expandedGuests, setExpandedGuests] = useState(false);
-  const [isOverflowing, setIsOverflowing] = useState(false);
+  console.log(expandedGuests);
   const contentRef = useRef(null);
 
   //DATE
@@ -18,7 +20,7 @@ function BookingRow({ booking }) {
 
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const day = days[date.getDay()];
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const dayOfMonth = String(date.getDate()).padStart(2, "0");
     const year = date.getFullYear();
 
@@ -26,19 +28,16 @@ function BookingRow({ booking }) {
   };
 
   const calculateStayDetails = (arrivalDateString, departureDateString) => {
-    const currentDate = new Date(); // Current date
-    const arrivalDate = new Date(arrivalDateString); // Guest's arrival date
-    const departureDate = new Date(departureDateString); // Guest's departure date
+    const currentDate = new Date();
+    const arrivalDate = new Date(arrivalDateString);
+    const departureDate = new Date(departureDateString);
 
-    // Calculate time until arrival
-    const timeUntilArrival = arrivalDate - currentDate; // Difference in milliseconds
+    const timeUntilArrival = arrivalDate - currentDate;
 
-    const daysUntilArrival = Math.ceil(timeUntilArrival / 86400000); // Convert ms to days
+    const daysUntilArrival = Math.ceil(timeUntilArrival / 86400000);
 
-    // Calculate stay duration
-    const stayDuration = Math.ceil((departureDate - arrivalDate) / 86400000); // Convert ms to days
+    const stayDuration = Math.ceil((departureDate - arrivalDate) / 86400000);
 
-    // Convert time until arrival to years, months, and days
     const yearsUntilArrival = Math.floor(daysUntilArrival / 365);
 
     const remainingDaysAfterYears = daysUntilArrival % 365;
@@ -47,7 +46,6 @@ function BookingRow({ booking }) {
 
     const daysAfterMonths = remainingDaysAfterYears % 30;
 
-    // Build arrival time string
     let arrivalString = "In ";
     if (yearsUntilArrival > 0) arrivalString += `${yearsUntilArrival} year(s) `;
     if (monthsUntilArrival > 0)
@@ -80,50 +78,44 @@ function BookingRow({ booking }) {
     observation,
     status,
     extraPrice,
-    hasBreakfast,
     cabins,
     bookings_guests,
   } = booking;
 
-  function handleCheckOverflow() {
-    if (contentRef.current) {
-      const element = contentRef.current;
-      const isContentOverflowing =
-        element.scrollHeight > element.offsetHeight ||
-        element.scrollWidth > element.offsetWidth;
-      setIsOverflowing(isContentOverflowing);
-    }
-  }
-
-  function handleShowMore() {
-    setExpandedGuests((prev) => !prev);
-    setIsOverflowing((prev) => !prev);
-  }
+  console.log(bookings_guests);
 
   calculateStayDetails(startDate, endDate);
 
-  useEffect(() => {
-    handleCheckOverflow();
-
-    const handleResize = () => {
-      handleCheckOverflow();
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [bookings_guests, expandedGuests]);
-
   //AMOUNT
   //................................................................................................................................................................................
-  const finalPrice = cabins.discount
-    ? cabins.price_per_night +
-      (hasBreakfast && 125) +
-      extraPrice -
-      Math.abs(cabins.discount)
-    : cabins.price_per_night + (hasBreakfast && 125) + extraPrice;
+  //   const finalPrice = cabins.discount
+  //     ? cabins.price_per_night +
+  //       (hasBreakfast && 125 * numGuests) +
+  //       extraPrice -
+  //       Math.abs(cabins.discount)
+  //     : cabins.price_per_night + (hasBreakfast && 125) + extraPrice;
+  const finalPrice =
+    bookings_guests.length > 1
+      ? cabins.discount
+        ? cabins.price_per_night +
+          extraPrice -
+          Math.abs(cabins.discount) +
+          125 * bookings_guests.filter((guest) => guest.hasBreakfast).length
+        : cabins.price_per_night +
+          extraPrice +
+          125 * bookings_guests.filter((guest) => guest.hasBreakfast).length
+      : cabins.discount
+      ? cabins.price_per_night +
+        extraPrice -
+        Math.abs(cabins.discount) +
+        (bookings_guests[0].hasBreakfast && 125)
+      : cabins.price_per_night +
+        extraPrice +
+        (bookings_guests[0].hasBreakfast && 125);
+
+  function handleExpandedGuest() {
+    setExpandedGuests((exp) => !exp);
+  }
 
   //................................................................................................................................................................................
 
@@ -134,35 +126,65 @@ function BookingRow({ booking }) {
           <div className="flex justify-center items-center font-bold p-2">
             {cabins.cabin_name}
           </div>
-          <div className="truncate">
-            <div className="flex justify-start" ref={contentRef}>
-              <div
-                className={
-                  expandedGuests ? "grid grid-cols-2" : "flex flex-row"
-                }
-              >
-                {bookings_guests?.map((guest) => (
-                  <div
-                    className="text-start p-2 break-words"
-                    key={guest.guests.id}
-                  >
-                    <div className="font-bold text-wrap">
-                      {guest.guests.fullName}
-                    </div>
-
-                    <div className="font-extralight text-wrap">
-                      {guest.guests.email}
-                    </div>
+          <div
+            className={`${
+              expandedGuests ? "grid grid-cols-2" : "flex"
+            } items-center justify-around nth-child-2`}
+            ref={contentRef}
+          >
+            {expandedGuests ? (
+              bookings_guests.map((guest) => (
+                <div
+                  className="text-start p-2 break-words"
+                  key={guest.guests.id}
+                >
+                  <div className="font-bold text-wrap">
+                    {guest.guests.fullName}
                   </div>
-                ))}
-              </div>
-            </div>
 
-            {isOverflowing && (
+                  <div className="font-extralight text-wrap ">
+                    {guest.guests.email}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div
+                className="text-start p-2 break-words"
+                key={bookings_guests[0].guests.id}
+              >
+                <div className="font-bold text-wrap">
+                  {bookings_guests[0].guests.fullName}
+                </div>
+
+                <div className="font-extralight text-wrap ">
+                  {bookings_guests[0].guests.email}
+                </div>
+              </div>
+            )}
+
+            {bookings_guests.length > 1 ? (
+              expandedGuests ? (
+                <button onClick={() => handleExpandedGuest()} className="">
+                  <MdCloseFullscreen />
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleExpandedGuest()}
+                  className="flex h-[100%] pt-3"
+                >
+                  <BsArrowsAngleExpand />
+                </button>
+              )
+            ) : (
+              <div></div>
+            )}
+          </div>
+
+          {/* {isOverflowing && (
               <div className="flex justify-center w-[100%] pb-1">
                 <button
                   onClick={handleShowMore}
-                  className="text-blue-500 text-sm mt-1"
+                  className="text-blue-500 text-sm"
                 >
                   Show More...
                 </button>
@@ -173,14 +195,13 @@ function BookingRow({ booking }) {
               <div className="flex justify-center w-[100%] pb-1">
                 <button
                   onClick={handleShowMore}
-                  className="text-blue-500 text-sm mt-1"
+                  className="text-blue-500 text-sm"
                 >
                   Show Less...
                 </button>
               </div>
-            )}
-          </div>
-          <div className="flex items-center flex-col p-2 justify-center">
+            )} */}
+          <div className="flex items-start flex-col p-2 justify-center">
             <div> {calculateStayDetails(startDate, endDate)}</div>
             <div className="font-extralight text-wrap flex items-center text-xs">
               <div className="p-2">{formatDateManual(startDate)}</div>

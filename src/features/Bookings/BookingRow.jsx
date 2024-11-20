@@ -1,16 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Menus from "../../ui/Menus";
 import Modal from "../../ui/Modal";
 import Table from "../../ui/Table";
-import { HiOutlineArrowNarrowRight } from "react-icons/hi";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { BsArrowsAngleExpand } from "react-icons/bs";
-import { MdCloseFullscreen } from "react-icons/md";
+import { VscFold } from "react-icons/vsc";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { FaPlusCircle } from "react-icons/fa";
+import { RiDeleteBin5Fill } from "react-icons/ri";
+import { FaUserCheck } from "react-icons/fa";
+import ConfirmDelete from "../../ui/ConfirmDelete";
+import { useNavigate } from "react-router-dom";
 
 function BookingRow({ booking }) {
   const [expandedGuests, setExpandedGuests] = useState(false);
-  console.log(expandedGuests);
   const contentRef = useRef(null);
 
   //DATE
@@ -74,7 +78,6 @@ function BookingRow({ booking }) {
     startDate,
     endDate,
     numGuests,
-    numNights,
     observation,
     status,
     extraPrice,
@@ -82,41 +85,40 @@ function BookingRow({ booking }) {
     bookings_guests,
   } = booking;
 
-  console.log(bookings_guests);
+  //CALCULATE NIGHTS STAY FOR PRICE
+  //..............................................................................................................................................................................
+  const arrivalDate = new Date(startDate);
+  const departureDate = new Date(endDate);
+  const stayDuration = Math.ceil((departureDate - arrivalDate) / 86400000);
 
-  calculateStayDetails(startDate, endDate);
-
-  //AMOUNT
-  //................................................................................................................................................................................
-  //   const finalPrice = cabins.discount
-  //     ? cabins.price_per_night +
-  //       (hasBreakfast && 125 * numGuests) +
-  //       extraPrice -
-  //       Math.abs(cabins.discount)
-  //     : cabins.price_per_night + (hasBreakfast && 125) + extraPrice;
   const finalPrice =
     bookings_guests.length > 1
       ? cabins.discount
         ? cabins.price_per_night +
           extraPrice -
           Math.abs(cabins.discount) +
-          125 * bookings_guests.filter((guest) => guest.hasBreakfast).length
+          125 *
+            stayDuration *
+            bookings_guests.filter((guest) => guest.hasBreakfast).length
         : cabins.price_per_night +
           extraPrice +
-          125 * bookings_guests.filter((guest) => guest.hasBreakfast).length
+          125 *
+            stayDuration *
+            bookings_guests.filter((guest) => guest.hasBreakfast).length
       : cabins.discount
       ? cabins.price_per_night +
         extraPrice -
         Math.abs(cabins.discount) +
-        (bookings_guests[0].hasBreakfast && 125)
+        (bookings_guests[0].hasBreakfast && 125 * stayDuration)
       : cabins.price_per_night +
         extraPrice +
-        (bookings_guests[0].hasBreakfast && 125);
+        (bookings_guests[0].hasBreakfast && 125 * stayDuration);
 
   function handleExpandedGuest() {
     setExpandedGuests((exp) => !exp);
   }
 
+  const navigate = useNavigate();
   //................................................................................................................................................................................
 
   return (
@@ -161,46 +163,30 @@ function BookingRow({ booking }) {
                 </div>
               </div>
             )}
-
-            {bookings_guests.length > 1 ? (
-              expandedGuests ? (
-                <button onClick={() => handleExpandedGuest()} className="">
-                  <MdCloseFullscreen />
-                </button>
+            <div className="grid col-span-2 items-end justify-center">
+              {bookings_guests.length > 1 ? (
+                expandedGuests ? (
+                  <button
+                    onClick={() => handleExpandedGuest()}
+                    className="p-2 text-lg"
+                  >
+                    <div></div>
+                    <VscFold />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleExpandedGuest()}
+                    className="h-[100%] pt-3"
+                  >
+                    <BsArrowsAngleExpand />
+                  </button>
+                )
               ) : (
-                <button
-                  onClick={() => handleExpandedGuest()}
-                  className="flex h-[100%] pt-3"
-                >
-                  <BsArrowsAngleExpand />
-                </button>
-              )
-            ) : (
-              <div></div>
-            )}
+                <div></div>
+              )}
+            </div>
           </div>
 
-          {/* {isOverflowing && (
-              <div className="flex justify-center w-[100%] pb-1">
-                <button
-                  onClick={handleShowMore}
-                  className="text-blue-500 text-sm"
-                >
-                  Show More...
-                </button>
-              </div>
-            )}
-
-            {!isOverflowing && expandedGuests && (
-              <div className="flex justify-center w-[100%] pb-1">
-                <button
-                  onClick={handleShowMore}
-                  className="text-blue-500 text-sm"
-                >
-                  Show Less...
-                </button>
-              </div>
-            )} */}
           <div className="flex items-start flex-col p-2 justify-center">
             <div> {calculateStayDetails(startDate, endDate)}</div>
             <div className="font-extralight text-wrap flex items-center text-xs">
@@ -225,7 +211,52 @@ function BookingRow({ booking }) {
           <div className="flex justify-center items-center font-bold">
             {formatCurrency(finalPrice)}
           </div>
-          <div></div>
+
+          <div className="text-2xl flex justify-end items-center p-4">
+            <Menus.Toggle
+              id={id}
+              icon={<BsThreeDotsVertical />}
+              effect={"transition-all hover:text-dark-yellow"}
+            />
+            <Menus.List id={id}>
+              <Menus.Button
+                styleBox={"transition-all rounded-lg hover:bg-background-grey"}
+                styleSpan={"flex items-center m-2 p-1"}
+                icon={<FaPlusCircle />}
+                onClick={() => navigate(`/bookings/${id}`)}
+              >
+                Show All Details
+              </Menus.Button>
+              <Menus.Button
+                styleBox={"transition-all rounded-lg hover:bg-background-grey"}
+                styleSpan={"flex items-center m-2 p-1"}
+                icon={<FaUserCheck />}
+                onClick={() => navigate(`/checkin/${id}`)}
+              >
+                Check-In
+              </Menus.Button>
+
+              <Modal.Open opens={"delete"}>
+                <Menus.Button
+                  styleBox={
+                    "transition-all rounded-lg hover:bg-background-grey"
+                  }
+                  styleSpan={"flex items-center m-2 p-1"}
+                  icon={<RiDeleteBin5Fill />}
+                >
+                  Delete
+                </Menus.Button>
+              </Modal.Open>
+            </Menus.List>
+          </div>
+
+          <Modal.Window name={"delete"}>
+            <ConfirmDelete
+              name={`Booking num #${id}`}
+              id={id}
+              action={"book"}
+            />
+          </Modal.Window>
         </Menus>
       </Modal>
     </Table.Row>

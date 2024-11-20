@@ -24,6 +24,7 @@ function ConfirmDelete({ id, name, onCloseModal, action }) {
           onClick={() => {
             action === "cab" && delCab(id);
             action === "guest" && delGuest(id);
+            action === "book" && delGuest(id);
           }}
           className="bg-red-800 text-white mx-1 px-6 py-2 rounded-md border transition-all border-slate-200 hover:scale-[1.02]"
         >

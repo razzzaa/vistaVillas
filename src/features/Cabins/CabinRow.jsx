@@ -86,7 +86,11 @@ function CabinRow({ cabin }) {
           </div>
 
           <div className="text-2xl flex justify-end items-center p-4">
-            <Menus.Toggle icon={<MdExpandMore />} id={id} />
+            <Menus.Toggle
+              icon={<MdExpandMore />}
+              id={id}
+              effect={"transition-all focus:rotate-180 hover:text-dark-yellow"}
+            />
             <Menus.List id={id}>
               <Modal.Open opens={"edit"}>
                 <Menus.Button

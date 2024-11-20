@@ -20,7 +20,7 @@ function Menus({ children }) {
   );
 }
 
-function Toggle({ id, icon }) {
+function Toggle({ id, icon, effect = "" }) {
   const { openId, close, open, setPosition, position } =
     useContext(MenusContext) || {};
 
@@ -35,10 +35,7 @@ function Toggle({ id, icon }) {
     openId === "" || openId !== id ? open(id) : close();
   }
   return (
-    <button
-      onClick={handleClick}
-      className="transition-all focus:rotate-180 hover:text-dark-yellow"
-    >
+    <button onClick={handleClick} className={effect}>
       {icon}
     </button>
   );

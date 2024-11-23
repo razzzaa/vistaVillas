@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getBookings } from "../../services/apiBookings";
-getBookings;
+import { getAllBookings } from "../../services/apiBookings";
 
 export function useBookings() {
   const {
@@ -9,7 +8,7 @@ export function useBookings() {
     error,
   } = useQuery({
     queryKey: ["bookings"],
-    queryFn: getBookings,
+    queryFn: getAllBookings,
   });
 
   return { bookings, isLoading };

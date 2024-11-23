@@ -2,88 +2,48 @@ import { useRef, useState } from "react";
 import Menus from "../../ui/Menus";
 import Modal from "../../ui/Modal";
 import Table from "../../ui/Table";
-import { FaLongArrowAltRight } from "react-icons/fa";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { BsArrowsAngleExpand } from "react-icons/bs";
 import { VscFold } from "react-icons/vsc";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { PiDotsThreeVerticalBold } from "react-icons/pi";
 import { FaPlusCircle } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { FaUserCheck } from "react-icons/fa";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import { useNavigate } from "react-router-dom";
+import useSettings from "../Settings/useSettings";
+import {
+  formatDateManual,
+  calculateStayDetails,
+} from "../../utils/dateFunctions";
+import { FaLongArrowAltRight } from "react-icons/fa";
+import priceCalculator from "../../utils/priceCalculator";
 
 function BookingRow({ booking }) {
   const [expandedGuests, setExpandedGuests] = useState(false);
   const contentRef = useRef(null);
+  const { settings } = useSettings();
 
   //DATE
   //................................................................................................................................................................................
-  const formatDateManual = (dateString) => {
-    const date = new Date(dateString);
-
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const day = days[date.getDay()];
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const dayOfMonth = String(date.getDate()).padStart(2, "0");
-    const year = date.getFullYear();
-
-    return `${day} ${month}/${dayOfMonth}/${year}`;
-  };
-
-  const calculateStayDetails = (arrivalDateString, departureDateString) => {
-    const currentDate = new Date();
-    const arrivalDate = new Date(arrivalDateString);
-    const departureDate = new Date(departureDateString);
-
-    const timeUntilArrival = arrivalDate - currentDate;
-
-    const daysUntilArrival = Math.ceil(timeUntilArrival / 86400000);
-
-    const stayDuration = Math.ceil((departureDate - arrivalDate) / 86400000);
-
-    const yearsUntilArrival = Math.floor(daysUntilArrival / 365);
-
-    const remainingDaysAfterYears = daysUntilArrival % 365;
-
-    const monthsUntilArrival = Math.floor(remainingDaysAfterYears / 30);
-
-    const daysAfterMonths = remainingDaysAfterYears % 30;
-
-    let arrivalString = "In ";
-    if (yearsUntilArrival > 0) arrivalString += `${yearsUntilArrival} year(s) `;
-    if (monthsUntilArrival > 0)
-      arrivalString += `${monthsUntilArrival} month(s) `;
-    if (daysAfterMonths > 0 || (!yearsUntilArrival && !monthsUntilArrival)) {
-      arrivalString += `${daysAfterMonths} day(s) `;
-    }
-    if (daysAfterMonths > 0 || (!yearsUntilArrival && !monthsUntilArrival)) {
-      arrivalString += `${daysAfterMonths} day(s) `;
-    }
-
-    const stayString = `${stayDuration} night stay`;
-
-    return (
-      <div className="flex items-center">
-        <div className="px-2">{arrivalString}</div>
-        <FaLongArrowAltRight />
-        <div className="px-2">{stayString}</div>
-      </div>
-    );
-  };
 
   const {
     id,
-    created_at,
     startDate,
     endDate,
-    numGuests,
-    observation,
     status,
     extraPrice,
     cabins,
     bookings_guests,
   } = booking;
+
+  const { arrivalString, stayString } = calculateStayDetails(
+    startDate,
+    endDate
+  );
+
+  console.log(arrivalString);
+  console.log(stayString);
 
   //CALCULATE NIGHTS STAY FOR PRICE
   //..............................................................................................................................................................................
@@ -91,34 +51,47 @@ function BookingRow({ booking }) {
   const departureDate = new Date(endDate);
   const stayDuration = Math.ceil((departureDate - arrivalDate) / 86400000);
 
+  priceCalculator(
+    bookings_guests.length,
+    cabins.discount,
+    cabins.price_per_night,
+    extraPrice,
+    settings?.breakfastPrice,
+    stayDuration,
+    bookings_guests
+  );
+
   const finalPrice =
     bookings_guests.length > 1
       ? cabins.discount
         ? cabins.price_per_night +
           extraPrice -
           Math.abs(cabins.discount) +
-          125 *
+          settings?.breakfastPrice *
             stayDuration *
             bookings_guests.filter((guest) => guest.hasBreakfast).length
         : cabins.price_per_night +
           extraPrice +
-          125 *
+          settings?.breakfastPrice *
             stayDuration *
             bookings_guests.filter((guest) => guest.hasBreakfast).length
       : cabins.discount
       ? cabins.price_per_night +
         extraPrice -
         Math.abs(cabins.discount) +
-        (bookings_guests[0].hasBreakfast && 125 * stayDuration)
+        (bookings_guests[0].hasBreakfast &&
+          settings?.breakfastPrice * stayDuration)
       : cabins.price_per_night +
         extraPrice +
-        (bookings_guests[0].hasBreakfast && 125 * stayDuration);
+        (bookings_guests[0].hasBreakfast &&
+          settings?.breakfastPrice * stayDuration);
 
   function handleExpandedGuest() {
     setExpandedGuests((exp) => !exp);
   }
 
   const navigate = useNavigate();
+
   //................................................................................................................................................................................
 
   return (
@@ -188,7 +161,13 @@ function BookingRow({ booking }) {
           </div>
 
           <div className="flex items-start flex-col p-2 justify-center">
-            <div> {calculateStayDetails(startDate, endDate)}</div>
+            <div>
+              <div className="flex items-center">
+                <div className="px-2">{arrivalString}</div>
+                <FaLongArrowAltRight />
+                <div className="px-2">{stayString}</div>
+              </div>
+            </div>
             <div className="font-extralight text-wrap flex items-center text-xs">
               <div className="p-2">{formatDateManual(startDate)}</div>
               {<FaLongArrowAltRight />}
@@ -215,7 +194,7 @@ function BookingRow({ booking }) {
           <div className="text-2xl flex justify-end items-center p-4">
             <Menus.Toggle
               id={id}
-              icon={<BsThreeDotsVertical />}
+              icon={<PiDotsThreeVerticalBold />}
               effect={"transition-all hover:text-dark-yellow"}
             />
             <Menus.List id={id}>

@@ -9,7 +9,7 @@ function AppLayout() {
       <NavBar />
       <SideBar />
       <main className="grid justify-center col-start-2 col-end-3 bg-background-grey p-6 overflow-auto">
-        <div className="w-[80vw]">
+        <div className="w-[70vw]">
           <Outlet />
         </div>
       </main>

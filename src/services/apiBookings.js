@@ -1,8 +1,8 @@
 import { supabase, supabaseUrl, supabaseKey } from "./supabase";
 
-export async function getBookings() {
+export async function getAllBookings() {
   const { data, error } = await supabase.from("bookings").select(
-    `id, created_at, startDate, endDate, numGuests, extraPrice, status, observation,
+    `id, created_at, startDate, endDate, numGuests, extraPrice, status, isPaid, observation,
       cabins(price_per_night, discount, availability, cabin_name),
       bookings_guests (hasBreakfast, guests (id, fullName, email, country, countryFlag)
       )`
@@ -15,6 +15,25 @@ export async function getBookings() {
   }
 
   return data;
+}
+
+export async function getBookingsById(id) {
+  const { data: booking, error } = await supabase
+    .from("bookings")
+    .select(
+      `id, created_at, startDate, endDate, numGuests, extraPrice, status, isPaid, observation, cabinId,
+      cabins(price_per_night, discount, availability, cabin_name),
+      bookings_guests (hasBreakfast, guests (id, fullName, email, country, countryFlag, nationalId)
+      )`
+    )
+    .eq("id", id)
+    .single();
+  if (error) {
+    console.log(error);
+  } else {
+    console.log("success", booking);
+  }
+  return booking;
 }
 
 export async function addEditBookings(newBooking, id) {

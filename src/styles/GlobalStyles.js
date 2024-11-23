@@ -31,8 +31,8 @@ const GlobalStyles = createGlobalStyle`
 
 :root {
     /* BUTTONS */
---color-green-button: #0F9D58
---color-red-button: #DB4437
+--color-green-button: #0F9D58;
+--color-red-button: #991b1b;
 
 
   /* Grey */
@@ -75,7 +75,17 @@ const GlobalStyles = createGlobalStyle`
   --color-brand-bright: #FFE169;
   --color-brand-medium: #FAD643;
   --color-brand-dark: #DBB42C;
-  
+
+  --color-red-bright:#FF6F6F;
+  --color-red-medium:#F14B4B;
+  --color-red-dark:#B24141;
+  --color-red-darker:#5C2A1E;
+
+  --color-green-bright: #66D69B;
+  --color-green-medium: #0F9D58;
+  --color-green-dark: #0C7A46;
+  --color-green-darker: #0A5C34;
+
   --border-radius-tiny: 3px;
   --border-radius-sm: 5px;
   --border-radius-md: 7px;

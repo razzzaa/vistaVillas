@@ -36,7 +36,7 @@ export async function getBookingsById(id) {
   return booking;
 }
 
-export async function addEditBookings(newBooking, id) {
+export async function addEditookings(newBooking, id) {
   if (!id) {
     console.log("no id");
     console.log(newBooking);
@@ -70,7 +70,7 @@ export async function addEditBookings(newBooking, id) {
   }
 }
 
-export async function deleteGuest(id) {
+export async function deleteBooking(id) {
   const { error } = await supabase.from("bookings").delete().eq("id", id);
   if (error) {
     console.error(error);

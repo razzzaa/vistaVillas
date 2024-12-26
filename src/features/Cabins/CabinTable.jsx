@@ -8,11 +8,28 @@ import Modal from "../../ui/Modal";
 import Form from "../../ui/Form";
 import Heading from "../../ui/Heading";
 import SpinnerMain from "../../ui/Spinner";
+import { useSearchParams } from "react-router-dom";
 
 function CabinTable() {
   const { cabins, isLoading } = useCabins();
+  const [searchParams] = useSearchParams();
 
   if (isLoading) return <SpinnerMain />;
+
+  const filterValue = searchParams.get("discount") || "all";
+  console.log(filterValue);
+  console.log(cabins);
+
+  let filteredValue;
+  if (filterValue === "all") {
+    filteredValue = cabins;
+  }
+  if (filterValue === "no-discount") {
+    filteredValue = cabins.filter((cabin) => cabin.discount === null);
+  }
+  if (filterValue === "with-discount") {
+    filteredValue = cabins.filter((cabin) => cabin.discount > 0);
+  }
 
   return (
     <Modal>
@@ -28,8 +45,8 @@ function CabinTable() {
             <div>TOTAL</div>
             <div></div>
           </Table.Header>
-          <Table.Body data={cabins}>
-            {cabins?.map((cabin) => (
+          <Table.Body data={filteredValue}>
+            {filteredValue?.map((cabin) => (
               <CabinRow key={cabin.id} cabin={cabin} />
             ))}
           </Table.Body>

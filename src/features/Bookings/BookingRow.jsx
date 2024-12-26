@@ -15,9 +15,10 @@ import useSettings from "../Settings/useSettings";
 import {
   formatDateManual,
   calculateStayDetails,
+  StayDurationCalc,
 } from "../../utils/dateFunctions";
 import { FaLongArrowAltRight } from "react-icons/fa";
-import priceCalculator from "../../utils/priceCalculator";
+import { FinalPrice } from "../../utils/priceCalculator";
 
 function BookingRow({ booking }) {
   const [expandedGuests, setExpandedGuests] = useState(false);
@@ -42,49 +43,7 @@ function BookingRow({ booking }) {
     endDate
   );
 
-  console.log(arrivalString);
-  console.log(stayString);
-
-  //CALCULATE NIGHTS STAY FOR PRICE
-  //..............................................................................................................................................................................
-  const arrivalDate = new Date(startDate);
-  const departureDate = new Date(endDate);
-  const stayDuration = Math.ceil((departureDate - arrivalDate) / 86400000);
-
-  priceCalculator(
-    bookings_guests.length,
-    cabins.discount,
-    cabins.price_per_night,
-    extraPrice,
-    settings?.breakfastPrice,
-    stayDuration,
-    bookings_guests
-  );
-
-  const finalPrice =
-    bookings_guests.length > 1
-      ? cabins.discount
-        ? cabins.price_per_night +
-          extraPrice -
-          Math.abs(cabins.discount) +
-          settings?.breakfastPrice *
-            stayDuration *
-            bookings_guests.filter((guest) => guest.hasBreakfast).length
-        : cabins.price_per_night +
-          extraPrice +
-          settings?.breakfastPrice *
-            stayDuration *
-            bookings_guests.filter((guest) => guest.hasBreakfast).length
-      : cabins.discount
-      ? cabins.price_per_night +
-        extraPrice -
-        Math.abs(cabins.discount) +
-        (bookings_guests[0].hasBreakfast &&
-          settings?.breakfastPrice * stayDuration)
-      : cabins.price_per_night +
-        extraPrice +
-        (bookings_guests[0].hasBreakfast &&
-          settings?.breakfastPrice * stayDuration);
+  const stayDuration = StayDurationCalc(startDate, endDate);
 
   function handleExpandedGuest() {
     setExpandedGuests((exp) => !exp);
@@ -99,7 +58,7 @@ function BookingRow({ booking }) {
       <Modal>
         <Menus>
           <div className="flex justify-center items-center font-bold p-2">
-            {cabins.cabin_name}
+            {cabins?.cabin_name}
           </div>
           <div
             className={`${
@@ -125,14 +84,14 @@ function BookingRow({ booking }) {
             ) : (
               <div
                 className="text-start p-2 break-words"
-                key={bookings_guests[0].guests.id}
+                key={bookings_guests[0]?.guests.id}
               >
                 <div className="font-bold text-wrap">
-                  {bookings_guests[0].guests.fullName}
+                  {bookings_guests[0]?.guests.fullName}
                 </div>
 
                 <div className="font-extralight text-wrap ">
-                  {bookings_guests[0].guests.email}
+                  {bookings_guests[0]?.guests.email}
                 </div>
               </div>
             )}
@@ -188,7 +147,17 @@ function BookingRow({ booking }) {
             </div>
           </div>
           <div className="flex justify-center items-center font-bold">
-            {formatCurrency(finalPrice)}
+            {formatCurrency(
+              FinalPrice(
+                bookings_guests?.length,
+                cabins?.discount,
+                cabins?.price_per_night,
+                extraPrice,
+                settings?.breakfastPrice,
+                stayDuration,
+                bookings_guests
+              )
+            )}
           </div>
 
           <div className="text-2xl flex justify-end items-center p-4">
@@ -206,26 +175,33 @@ function BookingRow({ booking }) {
               >
                 Show All Details
               </Menus.Button>
-              <Menus.Button
-                styleBox={"transition-all rounded-lg hover:bg-background-grey"}
-                styleSpan={"flex items-center m-2 p-1"}
-                icon={<FaUserCheck />}
-                onClick={() => navigate(`/checkin/${id}`)}
-              >
-                Check-In
-              </Menus.Button>
-
-              <Modal.Open opens={"delete"}>
+              {status === "unconfirmed" && (
                 <Menus.Button
                   styleBox={
                     "transition-all rounded-lg hover:bg-background-grey"
                   }
                   styleSpan={"flex items-center m-2 p-1"}
-                  icon={<RiDeleteBin5Fill />}
+                  icon={<FaUserCheck />}
+                  onClick={() => navigate(`/checkin/${id}`)}
                 >
-                  Delete
+                  Check-In
                 </Menus.Button>
-              </Modal.Open>
+              )}
+              {status === "checked_out" || status === "unconfirmed" ? (
+                <Modal.Open opens={"delete"}>
+                  <Menus.Button
+                    styleBox={
+                      "transition-all rounded-lg hover:bg-background-grey"
+                    }
+                    styleSpan={"flex items-center m-2 p-1"}
+                    icon={<RiDeleteBin5Fill />}
+                  >
+                    Delete
+                  </Menus.Button>
+                </Modal.Open>
+              ) : (
+                ""
+              )}
             </Menus.List>
           </div>
 

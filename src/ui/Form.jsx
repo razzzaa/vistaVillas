@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import useSettings from "../features/Settings/useSettings";
 import Spinner from "./Spinner";
@@ -17,6 +17,9 @@ import { FaUserPlus } from "react-icons/fa6";
 import useAddGuests from "../features/Guests/useAddGuests";
 import useEditGuests from "../features/Guests/useEditGuests";
 import { MdSaveAs } from "react-icons/md";
+import Datepicker from "react-tailwindcss-datepicker";
+import Select from "react-select";
+import { useGuests } from "../features/Guests/useGetGuests";
 
 const FormContext = createContext();
 
@@ -69,13 +72,7 @@ function Form({
   onCloseModal,
 }) {
   const { settings, isLoading } = useSettings();
-
-  console.log(duplicateData);
-
   const { id: editId, ...editData } = duplicateData;
-  //   const correctedDuplicateData
-  console.log(editData);
-  console.log(editId);
 
   //CABIN
   //........................................................................................................................
@@ -199,10 +196,16 @@ function Form({
     country: yup.string().required("Country is a required field"),
   });
 
+  //BOOKING
+  //............................................................................................................................
+  const bookingSchema = yup.object({});
+  //............................................................................................................................
+
   const schemaTypes = {
     cabin: cabinSchema,
     settings: settingsSchema,
     guests: guestsSchema,
+    booking: bookingSchema,
   };
 
   const [schema, setSchema] = useState(schemaType);
@@ -254,6 +257,7 @@ function Form({
         isEdited,
         editId,
         onCloseModal,
+        settings,
       }}
     >
       <div className="max-h-[80vh] overflow-auto">{children}</div>
@@ -554,10 +558,154 @@ function Guests({ style, header }) {
   );
 }
 
+// function Bookings({ style, header, bookings, selectRef, cabins }) {
+//   const { register, handleSubmit, errors, isEdited, editId, settings } =
+//     useContext(FormContext);
+//   const { guests } = useGuests();
+//   console.log(settings.maxGuestsPerBooking);
+
+//   //   console.log(guests);
+
+//   const guestsOptions = guests?.map((guest) => ({
+//     value: guest.fullName,
+//     label: guest.fullName, // Use the full name of the guest for the label
+//   }));
+
+//   const maxGuestsOptions = Array.from(
+//     { length: settings.maxGuestsPerBooking },
+//     (_, index) => ({
+//       value: (index + 1).toString(), // Convert the number to a string (for value)
+//       label: (index + 1).toString(), // Convert the number to a string (for label)
+//     })
+//   );
+
+//   const cabinsList = cabins
+//     .map((cabin) => {
+//       if (cabin.availability === true) {
+//         return {
+//           value: cabin.cabin_name,
+//           label: cabin.cabin_name,
+//         };
+//       }
+//       return null; // If the cabin is not available, return null
+//     })
+//     .filter((cabin) => cabin !== null);
+
+//   console.log(cabinsList);
+
+//   const onSubmit = (data) => {
+//     if (isEdited) {
+//       console.log("ed");
+//     } else {
+//       console.log(data);
+//     }
+//   };
+
+//   //GUESTS_SELECT
+//   {
+//     /* <label htmlFor="guestsNames" className="block text-sm font-medium text-gray-700 text-center">Guests</label>
+//               <Select
+//                 isMulti
+//                 name="guestsNames"
+//                 options={guestsOptions}
+//                 className="basic-multi-select"
+//                 classNamePrefix="select"
+//                 menuPortalTarget={document.body}
+//                 styles={{
+//                   menuPortal: (base) => ({
+//                     ...base,
+//                     zIndex: 9999,
+//                   }),
+//                 }}
+//               /> */
+//   }
+
+//   return (
+//     <form onSubmit={handleSubmit(onSubmit)}>
+//       <div className="flex justify-center">
+//         <Heading as="h3">{header}</Heading>
+//       </div>
+//       <div className={style}>
+//         <StyledFormUl>
+//           <StyledFormLi>
+//             <div className="p-4">
+//               <label
+//                 htmlFor="cabin"
+//                 className="block text-sm font-medium text-gray-700 text-center"
+//               >
+//                 Cabin
+//               </label>
+//               <Select
+//                 name="cabin"
+//                 options={cabinsList}
+//                 className="basic-multi-select"
+//                 classNamePrefix="select"
+//                 menuPortalTarget={document.body}
+//                 styles={{
+//                   menuPortal: (base) => ({
+//                     ...base,
+//                     zIndex: 9999,
+//                   }),
+//                 }}
+//               />
+//             </div>
+//             <div className="p-4">
+//               <label
+//                 htmlFor="guestsNames"
+//                 className="block text-sm font-medium text-gray-700 text-center"
+//               >
+//                 Number of Guests
+//               </label>
+//               <Select
+//                 name="maxGuests"
+//                 options={maxGuestsOptions}
+//                 className="basic-multi-select"
+//                 classNamePrefix="select"
+//                 menuPortalTarget={document.body}
+//                 styles={{
+//                   menuPortal: (base) => ({
+//                     ...base,
+//                     zIndex: 9999,
+//                   }),
+//                 }}
+//               />
+//             </div>
+//           </StyledFormLi>
+//           <div>
+//             <Select
+//               isMulti
+//               name="guests"
+//               options={guestsOptions}
+//               className="basic-multi-select"
+//               classNamePrefix="select"
+//               menuPortalTarget={document.body}
+//               styles={{
+//                 menuPortal: (base) => ({
+//                   ...base,
+//                   zIndex: 9999,
+//                 }),
+//               }}
+//             />
+//           </div>
+//         </StyledFormUl>
+//         <Button
+//           buttonContainer={"flex justify-center"}
+//           text={isEdited ? "SAVE" : "ADD"}
+//           icon={isEdited ? <MdSaveAs /> : <MdAddBusiness />}
+//           style={
+//             "flex justify-center items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md w-6/12"
+//           }
+//         />
+//       </div>
+//     </form>
+//   );
+// }
+
 /* <img src={`https://flagsapi.com/${countryFlag}/shiny/24.png/`} />; */
 
 Form.Cabin = Cabin;
 Form.Settings = Settings;
 Form.Guests = Guests;
+// Form.Bookings = Bookings;
 
 export default Form;

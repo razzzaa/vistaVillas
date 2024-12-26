@@ -44,3 +44,12 @@ export function calculateStayDetails(arrivalDateString, departureDateString) {
 
   return { arrivalString, stayString };
 }
+
+//CALCULATE NIGHTS STAY FOR PRICE
+//..............................................................................................................................................................................
+export function StayDurationCalc(arraival, checkOut) {
+  const arrivalDate = new Date(arraival);
+  const departureDate = new Date(checkOut);
+  const stayDuration = Math.ceil((departureDate - arrivalDate) / 86400000);
+  return stayDuration;
+}

@@ -37,8 +37,13 @@ function Row({ children }) {
   );
 }
 
+function Footer({ children }) {
+  return <div>{children}</div>;
+}
+
 Table.Header = Header;
 Table.Body = Body;
 Table.Row = Row;
+Table.Footer = Footer;
 
 export default Table;

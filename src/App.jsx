@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Guests from "./pages/Guests";
 import Booking from "./pages/Booking";
 import CheckIn from "./pages/checkin";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +42,7 @@ function App() {
               <Route path="users" element={<Users />} />
               <Route path="settings" element={<Settings />} />
             </Route>
+            <Route path="login" element={<Login />} />
           </Routes>
         </BrowserRouter>
         <ToastContainer />

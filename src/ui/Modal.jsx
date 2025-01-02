@@ -44,8 +44,6 @@ function Window({ children, name, cancelOutsideClick = false }) {
 
   useOutsideClick(close, true, ref);
 
-  console.log(cancelOutsideClick);
-
   if (name !== openName) return null;
 
   return createPortal(

@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import Form from "../../ui/Form.jsx";
 import Menus from "../../ui/Menus.jsx";
 import Modal from "../../ui/Modal.jsx";
@@ -7,12 +8,13 @@ import Table from "../../ui/Table.jsx";
 import BookingRow from "./BookingRow.jsx";
 import { useBookings } from "./useBookings.js";
 import { RiPlayListAddLine } from "react-icons/ri";
+import Pagination from "../../ui/Pagination.jsx";
 
 function BookingTable() {
-  const { bookings, isPending } = useBookings();
-  console.log(bookings);
+  const { bookings, isLoading, count } = useBookings();
+  const [searchParams] = useSearchParams();
 
-  if (isPending) return <SpinnerMain />;
+  if (isLoading) return <SpinnerMain />;
 
   return (
     <Modal>
@@ -31,6 +33,9 @@ function BookingTable() {
               <BookingRow key={booking.id} booking={booking} />
             ))}
           </Table.Body>
+          <Table.Footer>
+            <Pagination count={count} />
+          </Table.Footer>
         </Table>
         {/* <Modal.Open opens={"addBooking"}>
           <Menus.Button
@@ -61,3 +66,52 @@ function BookingTable() {
 }
 
 export default BookingTable;
+
+//CLIENT-SIDE FILTER AND SORTBY
+//FILTER
+//.....................................................................................................................................................
+//   const filterdValues = searchParams.get("booking") || "all";
+//   console.log(filterdValues);
+//   console.log(bookings);
+
+//   let filteredData;
+//   if (filterdValues === "all") {
+//     filteredData = bookings;
+//   }
+//   if (filterdValues === "confirmed") {
+//     filteredData = bookings.filter((booking) => booking.status === "confirmed");
+//   }
+//   if (filterdValues === "unconfirmed") {
+//     filteredData = bookings.filter(
+//       (booking) => booking.status === "unconfirmed"
+//     );
+//   }
+//   if (filterdValues === "checked_out") {
+//     filteredData = bookings.filter(
+//       (booking) => booking.status === "checked_out"
+//     );
+//   }
+//.....................................................................................................................................................
+
+//SORT
+//.....................................................................................................................................................
+//   const sortBy = searchParams.get("sortBy") || "startDate-asc";
+//   const [field, direction] = sortBy.split("-");
+//   console.log(filteredData);
+
+//   const modifier = direction === "asc" ? 1 : -1;
+//   const sortedBookings = filteredData.sort((a, b) => {
+//     const valA = a[field];
+//     const valB = b[field];
+
+//     // If the field is a date (e.g., "startDate"), convert the strings to Date objects
+//     if (field === "startDate") {
+//       const dateA = new Date(valA);
+//       const dateB = new Date(valB);
+
+//       // Compare Date objects
+//       return (dateA - dateB) * modifier;
+//     }
+//   });
+
+//.....................................................................................................................................................

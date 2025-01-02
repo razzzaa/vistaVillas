@@ -1,20 +1,37 @@
-import { supabase, supabaseUrl, supabaseKey } from "./supabase";
+import { supabase } from "./supabase";
 
-export async function getAllBookings() {
-  const { data, error } = await supabase.from("bookings").select(
+export async function getAllBookings({ filter, sortBy, page }) {
+  const PAGE_SIZE = 8;
+
+  let query = supabase.from("bookings").select(
     `id, created_at, startDate, endDate, numGuests, extraPrice, status, isPaid, observation,
       cabins(price_per_night, discount, availability, cabin_name),
       bookings_guests (hasBreakfast, guests (id, fullName, email, country, countryFlag)
-      )`
+      )`,
+    { count: "exact" }
   );
 
-  if (error) {
-    console.error("Error fetching bookings:", error);
-  } else {
-    console.log("Fetched bookings data:", data);
+  if (filter) query = query[filter.method || "eq"](filter.field, filter.value);
+
+  if (sortBy)
+    query = query.order(sortBy.field, {
+      ascending: sortBy.direction === "asc",
+    });
+
+  if (page) {
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
   }
 
-  return data;
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error(error);
+    throw new Error("Bookings could not be loaded");
+  }
+
+  return { data, count };
 }
 
 export async function getBookingsById(id) {

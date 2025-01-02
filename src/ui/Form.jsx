@@ -20,6 +20,8 @@ import { MdSaveAs } from "react-icons/md";
 import Datepicker from "react-tailwindcss-datepicker";
 import Select from "react-select";
 import { useGuests } from "../features/Guests/useGetGuests";
+import Logo from "./Logo";
+import { IoLogIn } from "react-icons/io5";
 
 const FormContext = createContext();
 
@@ -201,11 +203,17 @@ function Form({
   const bookingSchema = yup.object({});
   //............................................................................................................................
 
+  //LOGIN
+  //............................................................................................................................
+  const loginSchema = yup.object({});
+  //............................................................................................................................
+
   const schemaTypes = {
     cabin: cabinSchema,
     settings: settingsSchema,
     guests: guestsSchema,
     booking: bookingSchema,
+    login: loginSchema,
   };
 
   const [schema, setSchema] = useState(schemaType);
@@ -558,6 +566,46 @@ function Guests({ style, header }) {
   );
 }
 
+function Login() {
+  const { handleSubmit, register } = useContext(FormContext);
+  return (
+    <div>
+      <div className="flex flex-col	items-center">
+        <Logo />
+        <Heading className="mb-4 text-neutral-700" as="h3">
+          login to your account
+        </Heading>
+      </div>
+      <div className="flex justify-center ">
+        <ul>
+          <li className="flex justify-between m-2">
+            <label className="pr-2" htmlFor="email">
+              Email:
+            </label>
+            <StyledFormInput id="email" type="text" />
+          </li>
+          <li className="flex justify-between m-2">
+            <label className="pr-2" htmlFor="password">
+              Password:{" "}
+            </label>
+            <StyledFormInput id="password" type="text" />
+          </li>
+          <li>
+            <Button
+              icon={<IoLogIn />}
+              text="Log-In"
+              style={
+                "flex items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md"
+              }
+              buttonContainer={"flex justify-center"}
+            />
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 // function Bookings({ style, header, bookings, selectRef, cabins }) {
 //   const { register, handleSubmit, errors, isEdited, editId, settings } =
 //     useContext(FormContext);
@@ -706,6 +754,7 @@ function Guests({ style, header }) {
 Form.Cabin = Cabin;
 Form.Settings = Settings;
 Form.Guests = Guests;
+Form.Login = Login;
 // Form.Bookings = Bookings;
 
 export default Form;

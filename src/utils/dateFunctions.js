@@ -30,17 +30,32 @@ export function calculateStayDetails(arrivalDateString, departureDateString) {
   const daysAfterMonths = remainingDaysAfterYears % 30;
 
   let arrivalString = "In ";
-  if (yearsUntilArrival > 0) arrivalString += `${yearsUntilArrival} year(s) `;
-  if (monthsUntilArrival > 0)
-    arrivalString += `${monthsUntilArrival} month(s) `;
-  if (daysAfterMonths > 0 || (!yearsUntilArrival && !monthsUntilArrival)) {
-    arrivalString += `${daysAfterMonths} day(s) `;
+  const stayString = `${stayDuration} nights stay`;
+
+  if (daysUntilArrival === 0) {
+    arrivalString = "Arriving today";
+    console.log("today", arrivalString);
+
+    return { arrivalString, stayString };
   }
-  if (daysAfterMonths > 0 || (!yearsUntilArrival && !monthsUntilArrival)) {
-    arrivalString += `${daysAfterMonths} day(s) `;
+  if (daysUntilArrival < 0 && Math.abs(daysUntilArrival) >= stayDuration) {
+    arrivalString = `Stay Duration Expired, Time to Check-Out`;
+    console.log("checkOut", arrivalString);
+    return { arrivalString, daysUntilArrival };
   }
 
-  const stayString = `${stayDuration} night(s) stay`;
+  if (daysUntilArrival < 0) {
+    arrivalString = `${Math.abs(daysUntilArrival)} Days ago`;
+    console.log("Days ago", arrivalString);
+
+    return { arrivalString, stayString, daysUntilArrival };
+  }
+
+  if (yearsUntilArrival > 0) arrivalString += `${yearsUntilArrival} years `;
+  if (monthsUntilArrival > 0) arrivalString += `${monthsUntilArrival} months `;
+  if (daysAfterMonths > 0 || (!yearsUntilArrival && !monthsUntilArrival)) {
+    arrivalString += `${daysAfterMonths} days `;
+  }
 
   return { arrivalString, stayString };
 }

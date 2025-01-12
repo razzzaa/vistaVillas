@@ -1,10 +1,11 @@
+import { getToday } from "../utils/helpers";
 import { supabase } from "./supabase";
 
 export async function getAllBookings({ filter, sortBy, page }) {
   const PAGE_SIZE = 8;
 
   let query = supabase.from("bookings").select(
-    `id, created_at, startDate, endDate, numGuests, extraPrice, status, isPaid, observation,
+    `id, created_at, startDate, endDate, numGuests, extraPrice, status, isPaid, observation,totalPrice, numNights,
       cabins(price_per_night, discount, availability, cabin_name),
       bookings_guests (hasBreakfast, guests (id, fullName, email, country, countryFlag)
       )`,
@@ -38,7 +39,7 @@ export async function getBookingsById(id) {
   const { data: booking, error } = await supabase
     .from("bookings")
     .select(
-      `id, created_at, startDate, endDate, numGuests, extraPrice, status, isPaid, observation, cabinId,
+      `id, created_at, startDate, endDate, numGuests, extraPrice, status, isPaid, observation, cabinId, totalPrice, numNights,
       cabins(price_per_night, discount, availability, cabin_name),
       bookings_guests (hasBreakfast, guests (id, fullName, email, country, countryFlag, nationalId)
       )`
@@ -94,5 +95,69 @@ export async function deleteBooking(id) {
     throw new Error("Cannot delete booking");
   } else {
     console.log("success motherfucka!");
+  }
+}
+
+export async function calcFinalPrice(totalPrice, id) {
+  const { data, error } = await supabase
+    .from("bookings")
+    .update({ totalPrice: totalPrice })
+    .eq("id", id)
+    .select();
+  console.log(totalPrice);
+  console.log(data);
+  if (error) {
+    console.error(error);
+    throw new Error("Cannot get total price!");
+  } else {
+    console.log("success motherfucka!");
+  }
+}
+
+export async function getBookingsAfterDate(date) {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("created_at, totalPrice, extraPrice")
+    .gte("created_at", date)
+    .lte("created_at", getToday({ end: true }));
+
+  if (error) {
+    console.error(error);
+    throw new Error("Bookings could not get loaded");
+  }
+  return data;
+}
+
+export async function getStaysAfterDate(date) {
+  const { data, error } = await supabase
+    .from("bookings")
+    // .select('*')
+    .select("*", "booking_guests")
+    .gte("startDate", date)
+    .lte("startDate", getToday());
+
+  if (error) {
+    console.error(error);
+    throw new Error("Bookings could not get loaded");
+  }
+
+  return data;
+}
+
+export async function updateNumNights(numNights, id) {
+  console.log(numNights);
+  console.log(id);
+  const { data, error } = await supabase
+    .from("bookings")
+    .update({ numNights: numNights })
+    .eq("id", id)
+    .select();
+  console.log(numNights);
+  console.log(data);
+  if (error) {
+    console.error(error);
+    throw new Error("Cannot update nimber of nights!");
+  } else {
+    console.log("success mathafucka!");
   }
 }

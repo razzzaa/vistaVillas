@@ -6,7 +6,7 @@ function Cabins() {
   return (
     <>
       <div className="flex justify-between items-center">
-        <Heading as="h3">All Cabins</Heading>
+        <Heading as="h2">All Cabins</Heading>
         <CabinTableOperations />
       </div>
 

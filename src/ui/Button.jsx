@@ -10,7 +10,6 @@ function Button({
   active = false,
   children,
 }) {
-  console.log("got to the button");
   return (
     <div onClick={onClick} className={buttonContainer}>
       <button disabled={!isPressed} className={active ? active : style}>

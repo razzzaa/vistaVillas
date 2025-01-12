@@ -4,7 +4,7 @@ import Heading from "../ui/Heading";
 function Guests() {
   return (
     <div>
-      <Heading as="h3">Guests</Heading>
+      <Heading as="h2">Guests</Heading>
       <GuestsTable />
     </div>
   );

@@ -3,9 +3,9 @@ import NavBarMenu from "./NavBarMenu";
 
 function NavBar() {
   return (
-    <header className="flex justify-end border-[1px] col-start-2 col-end-3">
-      <NavBarMenu />
+    <header className="flex justify-end border-[1px]">
       <NavBarAvatar />
+      <NavBarMenu />
     </header>
   );
 }

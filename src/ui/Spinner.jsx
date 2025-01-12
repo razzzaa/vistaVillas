@@ -18,6 +18,8 @@ const SpinnerMain = styled.div`
   border-left: solid 0.7rem var(--color-grey-100);
   opacity: 0.8;
   animation: ${rotate} 1.2s infinite linear;
+  display: flex;
+  justify-content: center;
 `;
 
 export default SpinnerMain;

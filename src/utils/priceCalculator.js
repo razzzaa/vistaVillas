@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 export function FinalPrice(
   numGuests,
   discount,

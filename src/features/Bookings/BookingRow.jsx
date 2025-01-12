@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Menus from "../../ui/Menus";
 import Modal from "../../ui/Modal";
 import Table from "../../ui/Table";
@@ -19,11 +19,16 @@ import {
 } from "../../utils/dateFunctions";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { FinalPrice } from "../../utils/priceCalculator";
+import useCalcTotalPrice from "./useBookingFinalPrice";
+import useBookingNumNights from "./useBookingNumNights";
 
 function BookingRow({ booking }) {
   const [expandedGuests, setExpandedGuests] = useState(false);
   const contentRef = useRef(null);
   const { settings } = useSettings();
+  const { updateNights } = useBookingNumNights();
+
+  const { calcTotalPrice } = useCalcTotalPrice();
 
   //DATE
   //................................................................................................................................................................................
@@ -38,12 +43,12 @@ function BookingRow({ booking }) {
     bookings_guests,
   } = booking;
 
-  const { arrivalString, stayString } = calculateStayDetails(
+  const { arrivalString, stayString, daysUntilArrival } = calculateStayDetails(
     startDate,
     endDate
   );
 
-  const stayDuration = StayDurationCalc(startDate, endDate);
+  const numNights = StayDurationCalc(startDate, endDate);
 
   function handleExpandedGuest() {
     setExpandedGuests((exp) => !exp);
@@ -51,13 +56,29 @@ function BookingRow({ booking }) {
 
   const navigate = useNavigate();
 
+  const totalPrice = FinalPrice(
+    bookings_guests?.length,
+    cabins?.discount,
+    cabins?.price_per_night,
+    extraPrice,
+    settings?.breakfastPrice,
+    numNights,
+    bookings_guests
+  );
+
+  useEffect(() => {
+    console.log(totalPrice);
+    calcTotalPrice({ totalPrice, id });
+    updateNights({ numNights, id });
+  }, [totalPrice, calcTotalPrice, id, numNights, updateNights]);
+
   //................................................................................................................................................................................
 
   return (
     <Table.Row>
       <Modal>
         <Menus>
-          <div className="flex justify-center items-center font-bold p-2">
+          <div className="flex justify-center items-center font-bold p-2 text-center">
             {cabins?.cabin_name}
           </div>
           <div
@@ -122,8 +143,24 @@ function BookingRow({ booking }) {
           <div className="flex items-start flex-col p-2 justify-center">
             <div>
               <div className="flex items-center">
-                <div className="px-2">{arrivalString}</div>
-                <FaLongArrowAltRight />
+                <div
+                  className={`px-2 ${
+                    arrivalString === "Arriving today" &&
+                    "font-bold text-yellow-600 "
+                  }${
+                    arrivalString ===
+                      `Stay Duration Expired, Time to Check-Out` &&
+                    "font-bold text-red-600"
+                  }`}
+                >
+                  {arrivalString}
+                </div>
+                {arrivalString ===
+                `Stay Duration Expired, Time to Check-Out` ? (
+                  ""
+                ) : (
+                  <FaLongArrowAltRight />
+                )}
                 <div className="px-2">{stayString}</div>
               </div>
             </div>
@@ -147,17 +184,7 @@ function BookingRow({ booking }) {
             </div>
           </div>
           <div className="flex justify-center items-center font-bold">
-            {formatCurrency(
-              FinalPrice(
-                bookings_guests?.length,
-                cabins?.discount,
-                cabins?.price_per_night,
-                extraPrice,
-                settings?.breakfastPrice,
-                stayDuration,
-                bookings_guests
-              )
-            )}
+            {formatCurrency(totalPrice)}
           </div>
 
           <div className="text-2xl flex justify-end items-center p-4">

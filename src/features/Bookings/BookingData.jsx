@@ -47,10 +47,6 @@ function BookingData({ hide }) {
     setHideBookingBtns(hide);
   }, [hide]);
 
-  function handleExpandedGuest() {
-    setExpandedGuests((exp) => !exp);
-  }
-
   function handleCheckOut() {
     check({ status: "checked_out", id });
     navigate("/bookings");
@@ -65,22 +61,12 @@ function BookingData({ hide }) {
 
   const stayDuration = StayDurationCalc(booking?.startDate, booking?.endDate);
 
-  const finalPrice = FinalPrice(
-    booking?.bookings_guests.length,
-    booking?.cabins.discount,
-    booking?.cabins.price_per_night,
-    booking?.extraPrice,
-    settings?.breakfastPrice,
-    stayDuration,
-    booking?.bookings_guests
-  );
-
   return (
     <Modal>
       <div className="flex justify-between items-center">
         <Heading as="h3">Booking #{id}</Heading>
         <div
-          className={`w-auto h-auto text-center rounded-lg font-bold text-cyan-950 p-2 truncate text-xs ${
+          className={`w-auto h-auto text-center rounded-lg font-bold text-cyan-950 p-2 truncate text-xs mb-2 ${
             booking?.status === "confirmed" && "bg-green-200 text-green-700"
           } ${booking?.status === "unconfirmed" && "bg-red-300 text-red-800"} ${
             booking?.status === "checked_out" && "bg-stone-300"
@@ -159,109 +145,36 @@ function BookingData({ hide }) {
           <div
             className={`${
               booking?.isPaid ? "bg-green-200" : "bg-red-200"
-            } mx-6 py-4 px-8 rounded-md font-bold ${
-              expandedGuests
-                ? "grid items-center justify-items-start grid-cols-1"
-                : "flex items-center justify-between"
-            } `}
+            } mx-6 py-4 px-8 rounded-md font-bold flex items-center justify-between`}
           >
             <div className="flex items-center ">
               <div className="text-3xl pr-3">
                 <BsCashCoin />
               </div>
-              {expandedGuests ? (
-                <div className="grid grid-rows-6">
-                  {booking?.extraPrice && (
-                    <div className="flex font-normal">
-                      <header className="font-bold pr-1">Extra Fees:</header>
-                      Extra fees at checkout, including cabin damages, shipping,
-                      handling charges, and taxes .For more information, please
-                      inquire at the reception.
-                      <div className="font-bold pl-2">
-                        ({formatCurrency(booking.extraPrice)})
-                      </div>
-                    </div>
-                  )}
-                  {booking?.numGuests > 1 && (
-                    <div className=" flex font-normal">
-                      <header className="font-bold pr-1">Breakfast:</header>
-                      Number of guests with breakfast :{" "}
-                      {NumGuestsWithBreakfast(booking.bookings_guests)} *
-                      Breakfast price :{" "}
-                      {formatCurrency(settings?.breakfastPrice)} * Stay duration
-                      : {stayDuration} day(s).
-                      <div className="font-bold pl-2">
-                        {formatCurrency(
-                          NumGuestsWithBreakfast(booking.bookings_guests) *
-                            settings?.breakfastPrice *
-                            stayDuration
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {
-                    <div className="flex font-normal">
-                      <header className="font-bold pr-1">Cabin-Price:</header>
-                      Cabin price per-night:{" "}
-                      {formatCurrency(booking?.cabins.price_per_night)} * Stay
-                      duration: {stayDuration} day(s).
-                      <div className="pl-2 font-bold">
-                        {formatCurrency(
-                          booking?.cabins.price_per_night * stayDuration
-                        )}
-                      </div>
-                    </div>
-                  }
-                  {booking?.cabins.discount && (
-                    <div className="flex font-normal">
-                      <header className="font-bold pr-1">Discount:</header>
-                      Cabin discount:{" "}
-                      {formatCurrency(booking?.cabins.discount * stayDuration)}.
-                      <div className="pl-2 font-bold">
-                        {formatCurrency(
-                          booking?.cabins.discount * stayDuration
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  <div className="px-1 font-extrabold underline decoration-double	">
-                    {formatCurrency(finalPrice)}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex">
-                  {booking?.extraPrice &&
-                    `Extra-Fees: (${formatCurrency(booking.extraPrice)}) `}
-                  {booking?.numGuests > 1 &&
-                    ` + Breakfast: (${formatCurrency(
-                      NumGuestsWithBreakfast(booking.bookings_guests) *
-                        settings?.breakfastPrice *
-                        stayDuration
-                    )})`}
-                  {` + Cabin-Price: (${formatCurrency(
-                    booking?.cabins.price_per_night * stayDuration
+
+              <div className="flex">
+                {booking?.extraPrice &&
+                  `Extra-Fees: (${formatCurrency(booking.extraPrice)}) `}
+                {booking?.numGuests > 1 &&
+                  ` + Breakfast: (${formatCurrency(
+                    NumGuestsWithBreakfast(booking.bookings_guests) *
+                      settings?.breakfastPrice *
+                      stayDuration
                   )})`}
-                  {booking?.cabins.discount &&
-                    ` - Discount: (${formatCurrency(
-                      booking?.cabins.discount * stayDuration
-                    )})`}{" "}
-                  =
-                  <div className="px-1 font-extrabold underline decoration-double">
-                    {formatCurrency(finalPrice)}
-                  </div>
-                </div>
-              )}
-
-              <button onClick={() => handleExpandedGuest()} className="p-1">
-                <FaExpandAlt />
-              </button>
+                {` + Cabin-Price: (${formatCurrency(
+                  booking?.cabins.price_per_night * stayDuration
+                )})`}
+                {booking?.cabins.discount &&
+                  ` - Discount: (${formatCurrency(
+                    booking?.cabins.discount * stayDuration
+                  )})`}{" "}
+                = {formatCurrency(booking?.totalPrice)}
+              </div>
             </div>
-
-            {expandedGuests ? (
-              ""
-            ) : (
-              <div> {booking?.isPaid ? "PAID" : "WILL PAY AT PROPERTY"}</div>
-            )}
+            <div className="flex text-end pl-5">
+              {" "}
+              {booking?.isPaid ? "PAID" : "WILL PAY AT PROPERTY"}
+            </div>
           </div>
         </div>
       </div>

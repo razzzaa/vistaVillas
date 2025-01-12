@@ -22,6 +22,13 @@ import Select from "react-select";
 import { useGuests } from "../features/Guests/useGetGuests";
 import Logo from "./Logo";
 import { IoLogIn } from "react-icons/io5";
+import { useLogin } from "../features/authentication/useLogin";
+import { TiUserAdd } from "react-icons/ti";
+import { useSignup } from "../features/authentication/useSignup";
+import { useUser } from "../features/authentication/useUser";
+import useUpdateUser from "../features/authentication/useUpdateUser";
+import { FaUserCheck } from "react-icons/fa6";
+import { MdOutlinePassword } from "react-icons/md";
 
 const FormContext = createContext();
 
@@ -38,8 +45,8 @@ const StyledFormLi = styled.li`
   padding: 1.1rem;
   font-size: 1rem;
   font-weight: 400;
-  gap: 4.4rem;
-  grid-template-columns: 16rem 1fr 1.2fr;
+  gap: 2rem;
+  grid-template-columns: 10rem 1fr 1.2fr;
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
   }
@@ -76,6 +83,7 @@ function Form({
   const { settings, isLoading } = useSettings();
   const { id: editId, ...editData } = duplicateData;
 
+  /*FORM SCHEMA TYPES-------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
   //CABIN
   //........................................................................................................................
   const cabinSchema = yup.object({
@@ -144,6 +152,7 @@ function Form({
         }
       ),
   });
+  //........................................................................................................................
 
   //SETTINGS
   //........................................................................................................................
@@ -181,6 +190,7 @@ function Form({
       .integer()
       .required(),
   });
+  //........................................................................................................................
 
   //GUESTS
   //........................................................................................................................
@@ -197,6 +207,7 @@ function Form({
       .required("National-ID is required"),
     country: yup.string().required("Country is a required field"),
   });
+  //........................................................................................................................
 
   //BOOKING
   //............................................................................................................................
@@ -205,7 +216,43 @@ function Form({
 
   //LOGIN
   //............................................................................................................................
-  const loginSchema = yup.object({});
+  const loginSchema = yup.object({
+    email: yup.string().email().required(),
+    password: yup.string().required(),
+  });
+  //............................................................................................................................
+
+  //REGISTER
+  //............................................................................................................................
+  const registerSchema = yup.object({
+    fullName: yup.string().required(),
+    email: yup.string().email().required(),
+    password: yup.string().required().min(6).max(20),
+    confirmPassword: yup
+      .string()
+      .label("confirm password")
+      .required()
+      .oneOf([yup.ref("password"), null], "Passwords must match"),
+  });
+  //............................................................................................................................
+
+  //UPDATE ACCOUNT DETAILS
+  //............................................................................................................................
+  const updateUserDataSchema = yup.object({
+    fullName: yup.string().required(),
+  });
+  //............................................................................................................................
+
+  //UPDATE ACCOUNT PASSWORD
+  //............................................................................................................................
+  const updateUserPasswordSchema = yup.object({
+    password: yup.string().required().min(6).max(20),
+    confirmUpdatePassword: yup
+      .string()
+      .label("confirm password")
+      .required()
+      .oneOf([yup.ref("password"), null], "Passwords must match"),
+  });
   //............................................................................................................................
 
   const schemaTypes = {
@@ -214,6 +261,9 @@ function Form({
     guests: guestsSchema,
     booking: bookingSchema,
     login: loginSchema,
+    register: registerSchema,
+    updateUserData: updateUserDataSchema,
+    updateUserPassword: updateUserPasswordSchema,
   };
 
   const [schema, setSchema] = useState(schemaType);
@@ -249,6 +299,7 @@ function Form({
     handleSubmit,
     getValues,
     formState: { errors },
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: isEdited ? editData : {},
@@ -266,9 +317,10 @@ function Form({
         editId,
         onCloseModal,
         settings,
+        reset,
       }}
     >
-      <div className="max-h-[80vh] overflow-auto">{children}</div>
+      <div className="max-h-[80vh] overflow-auto p-3">{children}</div>
     </FormContext.Provider>
   );
 }
@@ -567,9 +619,16 @@ function Guests({ style, header }) {
 }
 
 function Login() {
-  const { handleSubmit, register } = useContext(FormContext);
+  const { handleSubmit, register, errors } = useContext(FormContext);
+  const { login, isLoading } = useLogin();
+
+  const onSubmit = (data) => {
+    const { email, password } = data;
+    login({ email, password });
+  };
+
   return (
-    <div>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col	items-center">
         <Logo />
         <Heading className="mb-4 text-neutral-700" as="h3">
@@ -582,14 +641,30 @@ function Login() {
             <label className="pr-2" htmlFor="email">
               Email:
             </label>
-            <StyledFormInput id="email" type="text" />
+            <StyledFormInput
+              id="email"
+              type="text"
+              {...register("email")}
+              disabled={isLoading}
+            />
           </li>
+          <li>
+            <p className="text-red-500 m-2">{errors.email?.message}</p>
+          </li>
+
           <li className="flex justify-between m-2">
             <label className="pr-2" htmlFor="password">
               Password:{" "}
             </label>
-            <StyledFormInput id="password" type="text" />
+            <StyledFormInput
+              id="password"
+              type="text"
+              {...register("password")}
+              disabled={isLoading}
+            />
           </li>
+          <p className="text-red-500 m-2">{errors.password?.message}</p>
+
           <li>
             <Button
               icon={<IoLogIn />}
@@ -598,11 +673,182 @@ function Login() {
                 "flex items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md"
               }
               buttonContainer={"flex justify-center"}
+              disabled={isLoading}
             />
           </li>
         </ul>
       </div>
-    </div>
+    </form>
+  );
+}
+
+function Register({ style }) {
+  const { handleSubmit, register, errors, reset } = useContext(FormContext);
+  const { signup, isLoading } = useSignup();
+
+  const onSubmit = ({ fullName, email, password }) => {
+    signup({ fullName, email, password }, { onSettled: reset });
+    console.log(fullName, email, password);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className={style}>
+        <StyledFormUl>
+          <StyledFormLi>
+            <label htmlFor="fullName">Full-Name : </label>
+            <StyledFormInput type="text" id="name" {...register("fullName")} />
+            <p className="text-red-500">{errors.fullName?.message}</p>
+          </StyledFormLi>
+
+          <StyledFormLi>
+            <label htmlFor="email">Email : </label>
+            <StyledFormInput type="email" id="email" {...register("email")} />
+            <p className="text-red-500">{errors.email?.message}</p>
+          </StyledFormLi>
+
+          <StyledFormLi>
+            <label htmlFor="password">Password : </label>
+            <StyledFormInput
+              type="text"
+              id="password"
+              {...register("password")}
+            />
+            <p className="text-red-500">{errors.password?.message}</p>
+          </StyledFormLi>
+
+          <StyledFormLi>
+            <label htmlFor="Password">Confirm-Password :</label>
+            <StyledFormInput id="Password" {...register("confirmPassword")} />
+            <p className="text-red-500">{errors.confirmPassword?.message}</p>
+          </StyledFormLi>
+        </StyledFormUl>
+      </div>
+      <Button
+        text={"Create-User"}
+        icon={<TiUserAdd />}
+        style={
+          "flex items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md"
+        }
+      />
+    </form>
+  );
+}
+
+function UpdateUserData({ style }) {
+  const { handleSubmit, register, errors, reset } = useContext(FormContext);
+  const {
+    user: {
+      email,
+      user_metadata: { fullName: currentFullName },
+    },
+    isLoading,
+  } = useUser();
+
+  const { updateUser, isPending } = useUpdateUser();
+  const [avatar, setAvatar] = useState("");
+
+  const onSubmit = ({ fullName, avatarFile }) => {
+    if (!fullName) return;
+    const avatar = avatarFile[0];
+    console.log(avatar);
+    updateUser({ fullName, avatar });
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className={style}>
+        <StyledFormUl>
+          <StyledFormLi>
+            <label htmlFor="email">Email : </label>
+            <StyledFormInput
+              value={email}
+              type="email"
+              id="email"
+              disabled={true}
+            />
+          </StyledFormLi>
+
+          <StyledFormLi>
+            <label htmlFor="fullName">Full-Name : </label>
+            <StyledFormInput
+              type="text"
+              id="fullName"
+              {...register("fullName")}
+              defaultValue={currentFullName}
+            />
+            <p className="text-red-500">{errors.fullName?.message}</p>
+          </StyledFormLi>
+
+          <StyledFormLi>
+            <label htmlFor="avatar">User-Avatar : </label>
+            <StyledFormInput
+              type="file"
+              id="avatar"
+              {...register("avatarFile")}
+            />
+            <p className="text-red-500">{errors.avatar?.message}</p>
+          </StyledFormLi>
+        </StyledFormUl>
+      </div>
+      <Button
+        text={"Update-Account"}
+        icon={<FaUserCheck />}
+        style={
+          "flex items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md"
+        }
+        buttonContainer={"flex justify-end"}
+      />
+    </form>
+  );
+}
+
+function UpdateUserPassword({ style }) {
+  const { handleSubmit, register, errors, reset } = useContext(FormContext);
+  const { updateUser, isPending } = useUpdateUser();
+
+  const onSubmit = ({ password }) => {
+    console.log(password);
+    if (!password) return;
+    updateUser({ password });
+    reset();
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className={style}>
+        <StyledFormUl>
+          <StyledFormLi>
+            <label htmlFor="password">Update-Password : </label>
+            <StyledFormInput
+              type="text"
+              id="password"
+              {...register("password")}
+            />
+            <p className="text-red-500">{errors.password?.message}</p>
+          </StyledFormLi>
+
+          <StyledFormLi>
+            <label htmlFor="confirmPassword">Confirm-Password :</label>
+            <StyledFormInput
+              id="confirmPassword"
+              {...register("confirmUpdatePassword")}
+            />
+            <p className="text-red-500">
+              {errors.confirmUpdatePassword?.message}
+            </p>
+          </StyledFormLi>
+        </StyledFormUl>
+      </div>
+      <Button
+        text={"Change-Password"}
+        icon={<MdOutlinePassword />}
+        style={
+          "flex items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md"
+        }
+        buttonContainer={"flex justify-end"}
+      />
+    </form>
   );
 }
 
@@ -755,6 +1001,10 @@ Form.Cabin = Cabin;
 Form.Settings = Settings;
 Form.Guests = Guests;
 Form.Login = Login;
+Form.Register = Register;
+Form.UpdateUserData = UpdateUserData;
+Form.UpdateUserPassword = UpdateUserPassword;
+
 // Form.Bookings = Bookings;
 
 export default Form;

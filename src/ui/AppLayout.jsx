@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import NavBar from "./NavBar";
 import SideBar from "./SideBar";
-import SpinnerMain from "./Spinner";
 
 function AppLayout() {
   return (

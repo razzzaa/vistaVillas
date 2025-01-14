@@ -2,13 +2,16 @@ import { useSearchParams } from "react-router-dom";
 import Button from "./Button";
 
 function Filter({ filterField, options }) {
-  console.log(filterField);
   const [searchParams, setSearchParams] = useSearchParams();
   const currentFilter = searchParams.get(filterField) || options.at(0).value;
-  console.log(currentFilter);
+  const currentPage = searchParams.get("page");
+
+  console.log(currentPage);
 
   function handleClick(value) {
     searchParams.set(filterField, value);
+    searchParams.set("page", 1);
+    console.log(searchParams);
     setSearchParams(searchParams);
   }
 

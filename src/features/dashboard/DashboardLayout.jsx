@@ -27,17 +27,24 @@ function DashboardLayout() {
   if (isLoading2 || isLoading1 || isLoading3) return <SpinnerMain />;
 
   return (
-    <StyledDashboardLayout>
-      <Stats
-        bookings={bookings}
-        confirmedStays={confirmedStays}
-        numDays={numDays}
-        cabinCount={cabins.length}
-      />
-      <div>Todays activity</div>
-      <DurationChart confirmedStays={confirmedStays} />
-      <SalesChart bookings={bookings} numDays={numDays} />
-    </StyledDashboardLayout>
+    <>
+      <StyledDashboardLayout>
+        <Stats
+          bookings={bookings}
+          confirmedStays={confirmedStays}
+          numDays={numDays}
+          cabinCount={cabins.length}
+        />
+      </StyledDashboardLayout>
+      <div className="flex justify-between pt-4">
+        <div className="grow-[1]">
+          <DurationChart confirmedStays={confirmedStays} />
+        </div>
+        <div className="grow-[1.5]">
+          <SalesChart bookings={bookings} numDays={numDays} />
+        </div>
+      </div>
+    </>
   );
 }
 

@@ -20,6 +20,9 @@ const SpinnerMain = styled.div`
   animation: ${rotate} 1.2s infinite linear;
   display: flex;
   justify-content: center;
+  position: absolute;
+  top: 50%;
+  right: 50%;
 `;
 
 export default SpinnerMain;

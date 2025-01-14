@@ -34,19 +34,15 @@ export function calculateStayDetails(arrivalDateString, departureDateString) {
 
   if (daysUntilArrival === 0) {
     arrivalString = "Arriving today";
-    console.log("today", arrivalString);
-
     return { arrivalString, stayString };
   }
   if (daysUntilArrival < 0 && Math.abs(daysUntilArrival) >= stayDuration) {
-    arrivalString = `Stay Duration Expired, Time to Check-Out`;
-    console.log("checkOut", arrivalString);
+    arrivalString = `Stay Duration Expired`;
     return { arrivalString, daysUntilArrival };
   }
 
   if (daysUntilArrival < 0) {
     arrivalString = `${Math.abs(daysUntilArrival)} Days ago`;
-    console.log("Days ago", arrivalString);
 
     return { arrivalString, stayString, daysUntilArrival };
   }

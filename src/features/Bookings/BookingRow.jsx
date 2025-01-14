@@ -67,7 +67,6 @@ function BookingRow({ booking }) {
   );
 
   useEffect(() => {
-    console.log(totalPrice);
     calcTotalPrice({ totalPrice, id });
     updateNights({ numNights, id });
   }, [totalPrice, calcTotalPrice, id, numNights, updateNights]);
@@ -148,15 +147,17 @@ function BookingRow({ booking }) {
                     arrivalString === "Arriving today" &&
                     "font-bold text-yellow-600 "
                   }${
-                    arrivalString ===
-                      `Stay Duration Expired, Time to Check-Out` &&
+                    arrivalString === "Stay Duration Expired" &&
+                    status === "confirmed" &&
                     "font-bold text-red-600"
                   }`}
                 >
-                  {arrivalString}
+                  {arrivalString === "Stay Duration Expired" &&
+                  status === "confirmed"
+                    ? `${arrivalString} , Time to Check-Out`
+                    : arrivalString}
                 </div>
-                {arrivalString ===
-                `Stay Duration Expired, Time to Check-Out` ? (
+                {arrivalString === `Stay Duration Expired` ? (
                   ""
                 ) : (
                   <FaLongArrowAltRight />

@@ -9,11 +9,9 @@ function useCalcTotalPrice() {
     mutationKey: ["bookings"],
     onSuccess: () => {
       userQuery.invalidateQueries({ queryKey: ["bookings"] });
-      console.log("total price updated");
     },
     onError: (error) => {
       console.error(error);
-      console.log("total price update failed");
     },
   });
   return { calcTotalPrice, isPending };

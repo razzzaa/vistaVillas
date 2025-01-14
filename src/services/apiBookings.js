@@ -48,8 +48,6 @@ export async function getBookingsById(id) {
     .single();
   if (error) {
     console.log(error);
-  } else {
-    console.log("success", booking);
   }
   return booking;
 }
@@ -66,8 +64,6 @@ export async function addEditookings(newBooking, id) {
     console.log(booking);
     if (error) {
       console.log(error);
-    } else {
-      console.log("success", booking);
     }
   }
 
@@ -81,9 +77,6 @@ export async function addEditookings(newBooking, id) {
       .select();
     if (error) {
       console.log(error);
-    } else {
-      console.log("success", booking);
-      console.log(booking);
     }
   }
 }
@@ -93,8 +86,6 @@ export async function deleteBooking(id) {
   if (error) {
     console.error(error);
     throw new Error("Cannot delete booking");
-  } else {
-    console.log("success motherfucka!");
   }
 }
 
@@ -104,13 +95,9 @@ export async function calcFinalPrice(totalPrice, id) {
     .update({ totalPrice: totalPrice })
     .eq("id", id)
     .select();
-  console.log(totalPrice);
-  console.log(data);
   if (error) {
     console.error(error);
     throw new Error("Cannot get total price!");
-  } else {
-    console.log("success motherfucka!");
   }
 }
 
@@ -145,19 +132,13 @@ export async function getStaysAfterDate(date) {
 }
 
 export async function updateNumNights(numNights, id) {
-  console.log(numNights);
-  console.log(id);
   const { data, error } = await supabase
     .from("bookings")
     .update({ numNights: numNights })
     .eq("id", id)
     .select();
-  console.log(numNights);
-  console.log(data);
   if (error) {
     console.error(error);
     throw new Error("Cannot update nimber of nights!");
-  } else {
-    console.log("success mathafucka!");
   }
 }

@@ -9,11 +9,9 @@ function useBookingNumNights() {
     mutationKey: ["bookings"],
     onSuccess: () => {
       userQuery.invalidateQueries({ queryKey: ["bookings"] });
-      console.log("number of nights updated");
     },
     nError: (error) => {
       console.error(error);
-      console.log("total price update failed");
     },
   });
   return { updateNights, isLoading };

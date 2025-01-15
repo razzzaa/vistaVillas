@@ -24,6 +24,8 @@ function DashboardLayout() {
   } = useRecentStays();
   const { cabins, isLoading: isLoading3 } = useCabins();
 
+  console.log(cabins);
+
   if (isLoading2 || isLoading1 || isLoading3) return <SpinnerMain />;
 
   return (
@@ -33,7 +35,7 @@ function DashboardLayout() {
           bookings={bookings}
           confirmedStays={confirmedStays}
           numDays={numDays}
-          cabinCount={cabins.length}
+          cabinCount={cabins?.length}
         />
       </StyledDashboardLayout>
       <div className="flex justify-between pt-4">

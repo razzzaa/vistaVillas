@@ -1,14 +1,26 @@
 import { supabase, supabaseUrl, supabaseKey } from "./supabase";
 
-export async function getCabins() {
-  const { data, error } = await supabase.from("cabins").select("*");
+const PAGE_SIZE = 8;
+
+export async function getCabins({ page }) {
+  console.log(page);
+  let query = supabase.from("cabins").select("*", { count: "exact" });
+
+  if (page) {
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
+
+  console.log(data);
 
   if (error) {
     console.error(error);
     throw new Error("cabins cannot be loaded");
   }
-
-  return data;
+  return { data, count };
 }
 
 export async function addEditCabin(newCabin, id) {

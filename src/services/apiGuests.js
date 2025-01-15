@@ -1,13 +1,19 @@
 import { supabase, supabaseUrl, supabaseKey } from "./supabase";
 
 export async function getGuests() {
-  const { data, error } = await supabase.from("guests").select("*");
+  let query = supabase.from("guests").select("*", { count: "exact" });
+
+  const { data, error, count } = await query;
+
   if (error) {
     console.error(error);
   } else {
     console.log(data);
   }
-  return data;
+
+  console.log(count);
+
+  return { data, count };
 }
 
 export async function addEditGuests(newGuest, id) {

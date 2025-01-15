@@ -7,12 +7,11 @@ import Modal from "../../ui/Modal";
 import Form from "../../ui/Form";
 import SpinnerMain from "../../ui/Spinner";
 import { useSearchParams } from "react-router-dom";
+import Pagination from "../../ui/Pagination";
 
 function CabinTable() {
-  const { cabins, isLoading } = useCabins();
+  const { cabins, isLoading, count } = useCabins();
   const [searchParams] = useSearchParams();
-
-  console.log(cabins);
 
   if (isLoading) return <SpinnerMain />;
 
@@ -36,9 +35,6 @@ function CabinTable() {
   //.................................................................................................................................
   const sortBy = searchParams.get("sortBy") || "cabin_name-asc";
   const [field, direction] = sortBy.split("-");
-
-  console.log(field);
-  console.log(direction);
 
   //   const sortedCabins = filteredValue.sort(
   //     (a, b) => (a[field] - b[field]) * modifier
@@ -69,6 +65,8 @@ function CabinTable() {
     return 0;
   });
 
+  console.log(sortedCabins.length);
+
   return (
     <Modal>
       <Menus>
@@ -89,6 +87,9 @@ function CabinTable() {
             ))}
           </Table.Body>
         </Table>
+        <Table.Footer>
+          <Pagination count={count} />
+        </Table.Footer>
         <Modal.Open opens={"addCabin"}>
           <Menus.Button
             styleBox={""}

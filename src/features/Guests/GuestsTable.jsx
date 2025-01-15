@@ -8,10 +8,9 @@ import { useGuests } from "./useGetGuests";
 import { RiPlayListAddLine } from "react-icons/ri";
 
 function GuestsTable() {
-  const { guests, isPending, error } = useGuests();
-  console.log(guests);
+  const { guests, isLoading, error } = useGuests();
 
-  if (isPending) return <SpinnerMain />;
+  if (isLoading) return <SpinnerMain />;
 
   return (
     <div>
@@ -27,8 +26,8 @@ function GuestsTable() {
               <div></div>
               <div></div>
             </Table.Header>
-            <Table.Body data={guests}>
-              {guests?.map((guest, index) => (
+            <Table.Body data={guests.data}>
+              {guests.data?.map((guest, index) => (
                 <GuestsRow guest={guest} key={guest.id} index={index + 1} />
               ))}
             </Table.Body>

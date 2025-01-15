@@ -13,6 +13,7 @@ function Pagination({ count }) {
   const PAGE_SIZE = 8;
 
   const pageCount = Math.ceil(count / PAGE_SIZE);
+  console.log(pageCount);
 
   function nextPage() {
     const next = currentPage === pageCount ? currentPage : currentPage + 1;

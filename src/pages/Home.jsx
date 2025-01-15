@@ -4,7 +4,7 @@ import Heading from "../ui/Heading";
 
 function Home() {
   return (
-    <asd>
+    <>
       <div className="flex items-center justify-between mb-2">
         <Heading as="h2">Home-Panel</Heading>
         <DashboardFilter />
@@ -12,7 +12,7 @@ function Home() {
       <div>
         <DashboardLayout />
       </div>
-    </asd>
+    </>
   );
 }
 

@@ -14,7 +14,6 @@ function Sort({ options, value }) {
 
   function handleChange(e) {
     searchParams.set("sortBy", e.target.value);
-    console.log(e.target.value);
     setSearchParams(searchParams);
   }
 

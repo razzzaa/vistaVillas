@@ -13,6 +13,7 @@ import Pagination from "../../ui/Pagination.jsx";
 function BookingTable() {
   const { bookings, isLoading, count } = useBookings();
   const [searchParams] = useSearchParams();
+  console.log(bookings);
 
   if (isLoading) return <SpinnerMain />;
 

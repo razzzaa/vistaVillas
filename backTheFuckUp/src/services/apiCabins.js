@@ -2,10 +2,9 @@ import { supabase, supabaseUrl, supabaseKey } from "./supabase";
 
 const PAGE_SIZE = 8;
 
-export async function getCabins({ page, filter }) {
+export async function getCabins({ page }) {
+  console.log(page);
   let query = supabase.from("cabins").select("*", { count: "exact" });
-
-  if (filter) query = query[filter.method || "eq"](filter.field, filter.value);
 
   if (page) {
     const from = (page - 1) * PAGE_SIZE;
@@ -15,21 +14,25 @@ export async function getCabins({ page, filter }) {
 
   const { data, error, count } = await query;
 
+  console.log(data);
+
   if (error) {
     console.error(error);
     throw new Error("cabins cannot be loaded");
   }
-
   return { data, count };
 }
 
 export async function addEditCabin(newCabin, id) {
   const imageHasPath = newCabin.image?.startsWith?.(supabaseUrl);
 
+  console.log(imageHasPath);
+
   const imageName = `${Math.random()}-${newCabin.image[0].name}`.replaceAll(
     "/",
     ""
   );
+  console.log(imageName);
 
   const imagePath = imageHasPath
     ? newCabin.image
@@ -45,6 +48,8 @@ export async function addEditCabin(newCabin, id) {
     console.log(cabin);
     if (error) {
       console.log(error);
+    } else {
+      console.log("success", cabin);
     }
   }
 
@@ -57,6 +62,8 @@ export async function addEditCabin(newCabin, id) {
       .select();
     if (error) {
       console.log(error);
+    } else {
+      console.log("success", cabin);
     }
   }
 
@@ -66,6 +73,8 @@ export async function addEditCabin(newCabin, id) {
       .upload(imageName, newCabin.image[0]);
     if (storageError) {
       console.log(storageError);
+    } else {
+      console.log("ahui");
     }
   }
 }

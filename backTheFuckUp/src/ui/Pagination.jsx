@@ -8,7 +8,7 @@ function Pagination({ count }) {
     ? 1
     : Number(searchParams.get("page"));
 
-  console.log(currentPage);
+  //   console.log(count);
 
   const PAGE_SIZE = 8;
 

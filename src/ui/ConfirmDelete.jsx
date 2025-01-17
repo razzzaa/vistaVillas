@@ -1,8 +1,8 @@
 import { useState } from "react";
 import Heading from "./Heading";
-import useDeleteCabin from "../features/Cabins/useDeleteCabin";
+import useDeleteCabin from "../features/cabins/useDeleteCabin";
 import useDeleteGuests from "../features/Guests/useDeleteGuests";
-import useDeleteBooking from "../features/Bookings/useDeleteBooking";
+import useDeleteBooking from "../features/bookings/useDeleteBooking";
 import { useNavigate } from "react-router-dom";
 
 function ConfirmDelete({ id, name, onCloseModal, action }) {

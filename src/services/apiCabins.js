@@ -1,15 +1,19 @@
+import { constPageSize } from "../utils/pageSize";
 import { supabase, supabaseUrl, supabaseKey } from "./supabase";
 
-const PAGE_SIZE = 8;
-
-export async function getCabins({ page, filter }) {
+export async function getCabins({ page, filter, sort }) {
   let query = supabase.from("cabins").select("*", { count: "exact" });
+  console.log(sort);
 
   if (filter) query = query[filter.method || "eq"](filter.field, filter.value);
 
+  if (sort) {
+    query = query.order(sort.field, { ascending: sort.direction === "asc" });
+  }
+
   if (page) {
-    const from = (page - 1) * PAGE_SIZE;
-    const to = from + PAGE_SIZE - 1;
+    const from = (page - 1) * constPageSize;
+    const to = from + constPageSize - 1;
     query = query.range(from, to);
   }
 

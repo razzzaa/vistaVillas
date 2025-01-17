@@ -1,6 +1,7 @@
 import Form from "../../ui/Form";
 import Menus from "../../ui/Menus";
 import Modal from "../../ui/Modal";
+import Pagination from "../../ui/Pagination";
 import SpinnerMain from "../../ui/Spinner";
 import Table from "../../ui/Table";
 import GuestsRow from "./GuestsRow";
@@ -8,7 +9,9 @@ import { useGuests } from "./useGetGuests";
 import { RiPlayListAddLine } from "react-icons/ri";
 
 function GuestsTable() {
-  const { guests, isLoading, error } = useGuests();
+  const { guests, isLoading, error, count, pageSize } = useGuests();
+  console.log(guests);
+  console.log(count);
 
   if (isLoading) return <SpinnerMain />;
 
@@ -16,7 +19,7 @@ function GuestsTable() {
     <div>
       <Menus>
         <Modal>
-          <Table columns="grid grid-cols-[0.1fr_1fr_1fr_1fr_1fr_0.3fr_0.3fr]">
+          <Table columns="grid grid-cols-[0.1fr_1fr_1fr_1fr_1fr_0.3fr_0.3fr] text-md">
             <Table.Header>
               <div></div>
               <div>Full-Name</div>
@@ -26,11 +29,14 @@ function GuestsTable() {
               <div></div>
               <div></div>
             </Table.Header>
-            <Table.Body data={guests.data}>
-              {guests.data?.map((guest, index) => (
+            <Table.Body data={guests}>
+              {guests.map((guest, index) => (
                 <GuestsRow guest={guest} key={guest.id} index={index + 1} />
               ))}
             </Table.Body>
+            <Table.Footer>
+              <Pagination count={count} pageSize={pageSize} />
+            </Table.Footer>
           </Table>
           <Modal.Open opens={"addGuest"}>
             <Menus.Button

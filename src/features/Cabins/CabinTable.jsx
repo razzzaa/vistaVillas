@@ -12,7 +12,6 @@ import Pagination from "../../ui/Pagination";
 function CabinTable() {
   const { cabins, isLoading, count } = useCabins();
   const [searchParams] = useSearchParams();
-  console.log(cabins);
 
   if (isLoading) return <SpinnerMain />;
 

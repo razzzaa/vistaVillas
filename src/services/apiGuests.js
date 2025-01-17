@@ -1,19 +1,32 @@
 import { supabase, supabaseUrl, supabaseKey } from "./supabase";
 
-export async function getGuests() {
+export async function getGuests({ sort, page: { curPage, pageSize }, search }) {
   let query = supabase.from("guests").select("*", { count: "exact" });
+
+  if (sort) {
+    query = query.order(sort.field, { ascending: sort.direction === "asc" });
+  }
+
+  if (curPage) {
+    const from = (curPage - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    console.log(from);
+    console.log(to);
+    query = query.range(from, to);
+  }
+
+  //   if (search) {
+  //     query.query.textSearch(search.searchField, search.value);
+  //   }
 
   const { data, error, count } = await query;
 
   if (error) {
     console.error(error);
-  } else {
-    console.log(data);
   }
 
-  console.log(count);
-
-  return { data, count };
+  return { data, count, pageSize };
 }
 
 export async function addEditGuests(newGuest, id) {
@@ -28,8 +41,6 @@ export async function addEditGuests(newGuest, id) {
     console.log(guest);
     if (error) {
       console.log(error);
-    } else {
-      console.log("success", guest);
     }
   }
 
@@ -43,9 +54,6 @@ export async function addEditGuests(newGuest, id) {
       .select();
     if (error) {
       console.log(error);
-    } else {
-      console.log("success", guest);
-      console.log(guest);
     }
   }
 }
@@ -55,7 +63,5 @@ export async function deleteGuest(id) {
   if (error) {
     console.error(error);
     throw new Error("Cannot delete guest");
-  } else {
-    console.log("success motherfucka!");
   }
 }

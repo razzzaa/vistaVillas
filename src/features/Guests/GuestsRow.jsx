@@ -8,8 +8,6 @@ import { RiEdit2Fill } from "react-icons/ri";
 import { TiUserDelete } from "react-icons/ti";
 
 function GuestsRow({ guest, index }) {
-  console.log(guest);
-  console.log(index);
   const { id, fullName, email, nationalId, countryFlag, country } = guest;
 
   const countryForEdit = countryFlag + ` : ` + country;
@@ -18,7 +16,7 @@ function GuestsRow({ guest, index }) {
     <Table.Row>
       <Modal>
         <Menus>
-          <div className="flex justify-center items-center p-1 font-medium">
+          <div className="flex justify-center items-center p-1 font-medium ">
             #{index}
           </div>
           <div className="flex justify-center items-center p-1">{fullName}</div>

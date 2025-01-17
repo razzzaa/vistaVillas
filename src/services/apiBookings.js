@@ -1,9 +1,8 @@
 import { getToday } from "../utils/helpers";
+import { constPageSize } from "../utils/pageSize";
 import { supabase } from "./supabase";
 
 export async function getAllBookings({ filter, sortBy, page }) {
-  const PAGE_SIZE = 8;
-
   let query = supabase.from("bookings").select(
     `id, created_at, startDate, endDate, numGuests, extraPrice, status, isPaid, observation,totalPrice, numNights,
       cabins(price_per_night, discount, availability, cabin_name),
@@ -20,8 +19,8 @@ export async function getAllBookings({ filter, sortBy, page }) {
     });
 
   if (page) {
-    const from = (page - 1) * PAGE_SIZE;
-    const to = from + PAGE_SIZE - 1;
+    const from = (page - 1) * constPageSize;
+    const to = from + constPageSize - 1;
     query = query.range(from, to);
   }
 

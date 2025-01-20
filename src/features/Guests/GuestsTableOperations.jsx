@@ -1,9 +1,10 @@
-// import Search from "../../ui/Search";
+import Search from "../../ui/Search";
 import Sort from "../../ui/Sort";
 
 function GuestsTableOperations() {
   return (
     <div className="flex items-center">
+      <Search />
       <Sort
         options={[
           { value: "fullName-asc", label: "Sort by name (A-Z)" },

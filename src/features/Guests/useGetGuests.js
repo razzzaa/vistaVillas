@@ -1,18 +1,20 @@
 import { useSearchParams } from "react-router-dom";
 import { getGuests } from "../../services/apiGuests";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchValues } from "../../context/SearchContext";
 
 export function useGuests() {
   const [searchParams] = useSearchParams();
+  const { CurSearchValue } = useSearchValues();
 
   /* SORT......................................................................................................................................... */
   const sortBy = searchParams.get("sortBy") || "fullName-asc";
   const [field, direction] = sortBy.split("-");
   const sort = { field, direction };
-
   /*.............................................................................................................................................. */
 
   /* search.................................................................................................................................... */
+  const search = CurSearchValue;
   /*............................................................................................................................................... */
 
   /* pagination.................................................................................................................................... */
@@ -28,12 +30,9 @@ export function useGuests() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["guests", sort, page],
-    queryFn: () => getGuests({ sort, page }),
+    queryKey: ["guests", sort, page, search],
+    queryFn: () => getGuests({ sort, page, search }),
   });
-
-  console.log(count);
-  console.log(guests);
 
   return { guests, isLoading, error, count, pageSize };
 }

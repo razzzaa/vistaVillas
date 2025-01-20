@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useSearchValues } from "../../context/SearchContext";
 import Form from "../../ui/Form";
 import Menus from "../../ui/Menus";
 import Modal from "../../ui/Modal";
@@ -11,9 +13,20 @@ import { RiPlayListAddLine } from "react-icons/ri";
 function GuestsTable() {
   const { guests, isLoading, error, count, pageSize } = useGuests();
   console.log(guests);
-  console.log(count);
+  //   const { CurSearchValue } = useSearchValues();
 
   if (isLoading) return <SpinnerMain />;
+
+  //   let guestsData;
+  //   guestsData = guests;
+
+  //   if (CurSearchValue) {
+  //     guestsData = guests.filter(
+  //       (guest) =>
+  //         guest.fullName.toLowerCase().includes(CurSearchValue.toLowerCase()) &&
+  //         guest.email.toLowerCase().includes(CurSearchValue.toLowerCase())
+  //     );
+  //   }
 
   return (
     <div>

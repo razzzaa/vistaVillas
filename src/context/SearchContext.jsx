@@ -1,26 +1,38 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 const SearchContext = createContext();
 
 function SearchProvider({ children }) {
-  const [searchValue, setSearchValue] = useState();
+  const [CurSearchValue, setCurSearchValue] = useState("");
+  const [CurSearchFields, setCurSearchFields] = useState([]);
 
-  function handleSearch(e) {
-    setSearchValue(() => e.target.value);
+  function handleSearchValues(newSearchValue) {
+    setCurSearchValue((prevSearchValue) => newSearchValue);
   }
+
   return (
-    <SearchContext>
-      <div className="flex bg-white  m-2 rounded-l-md rounded-r-md border items-center ">
-        <input
-          className="p-3 rounded-lg"
-          type="text"
-          placeholder="Search..."
-          onChange={handleSearch()}
-        />
-        {children}
-      </div>
-    </SearchContext>
+    <SearchContext.Provider
+      value={{
+        CurSearchValue,
+        CurSearchFields,
+        setCurSearchFields,
+        setCurSearchValue,
+        handleSearchValues,
+      }}
+    >
+      {children}
+    </SearchContext.Provider>
   );
 }
 
-export default SearchProvider;
+function useSearchValues() {
+  const { handleSearchValues, CurSearchValue, CurSearchFields } =
+    useContext(SearchContext);
+  return {
+    CurSearchValue,
+    CurSearchFields,
+    handleSearchValues,
+  };
+}
+
+export { SearchProvider, useSearchValues };

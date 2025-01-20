@@ -7,6 +7,12 @@ export async function getGuests({ sort, page: { curPage, pageSize }, search }) {
     query = query.order(sort.field, { ascending: sort.direction === "asc" });
   }
 
+  if (search) {
+    console.log(search);
+    query = query.or(`fullName.ilike.%${search}%,email.ilike.%${search}%`);
+    console.log(query);
+  }
+
   if (curPage) {
     const from = (curPage - 1) * pageSize;
     const to = from + pageSize - 1;
@@ -16,11 +22,8 @@ export async function getGuests({ sort, page: { curPage, pageSize }, search }) {
     query = query.range(from, to);
   }
 
-  //   if (search) {
-  //     query.query.textSearch(search.searchField, search.value);
-  //   }
-
   const { data, error, count } = await query;
+  console.log(data);
 
   if (error) {
     console.error(error);

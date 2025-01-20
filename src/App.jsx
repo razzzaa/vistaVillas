@@ -16,6 +16,7 @@ import CheckIn from "./pages/checkin";
 import Login from "./pages/Login";
 import ProtectedRoute from "./ui/ProtectedRoute";
 import Account from "./pages/Account";
+import { SearchProvider } from "./context/SearchContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,34 +29,37 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <>
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools />
-        <GlobalStyles />
-        <BrowserRouter>
-          <Routes>
-            <Route
-              element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Navigate replace to="home" />} />
-              <Route path="home" element={<Home />} />
-              <Route path="bookings" element={<Bookings />} />
-              <Route path="bookings/:id" element={<Booking />} />
-              <Route path="checkin/:id" element={<CheckIn />} />
-              <Route path="cabins" element={<Cabins />} />
-              <Route path="guests" element={<Guests />} />
-              <Route path="users" element={<Users />} />
-              <Route path="accounts" element={<Account />} />
-              <Route path="settings" element={<Settings />} />
-            </Route>
-            <Route path="login" element={<Login />} />
-          </Routes>
-        </BrowserRouter>
-        <ToastContainer />
-      </QueryClientProvider>
+      <SearchProvider>
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools />
+
+          <GlobalStyles />
+          <BrowserRouter>
+            <Routes>
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Navigate replace to="home" />} />
+                <Route path="home" element={<Home />} />
+                <Route path="bookings" element={<Bookings />} />
+                <Route path="bookings/:id" element={<Booking />} />
+                <Route path="checkin/:id" element={<CheckIn />} />
+                <Route path="cabins" element={<Cabins />} />
+                <Route path="guests" element={<Guests />} />
+                <Route path="users" element={<Users />} />
+                <Route path="accounts" element={<Account />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
+              <Route path="login" element={<Login />} />
+            </Routes>
+          </BrowserRouter>
+          <ToastContainer />
+        </QueryClientProvider>
+      </SearchProvider>
     </>
   );
 }

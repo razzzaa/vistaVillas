@@ -3,7 +3,6 @@ import { supabase, supabaseUrl, supabaseKey } from "./supabase";
 
 export async function getCabins({ page, filter, sort }) {
   let query = supabase.from("cabins").select("*", { count: "exact" });
-  console.log(filter);
 
   if (filter) query = query[filter.method || "eq"](filter.field, filter.value);
 
@@ -23,7 +22,6 @@ export async function getCabins({ page, filter, sort }) {
     console.error(error);
     throw new Error("cabins cannot be loaded");
   }
-
   return { data, count };
 }
 

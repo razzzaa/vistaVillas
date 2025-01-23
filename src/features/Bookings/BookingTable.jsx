@@ -4,15 +4,18 @@ import Menus from "../../ui/Menus.jsx";
 import Modal from "../../ui/Modal.jsx";
 import SpinnerMain from "../../ui/Spinner.jsx";
 import Table from "../../ui/Table.jsx";
-// import { useCabins } from "../Cabins/useCabins.js";
 import BookingRow from "./BookingRow.jsx";
 import { useBookings } from "./useBookings.js";
 import { RiPlayListAddLine } from "react-icons/ri";
 import Pagination from "../../ui/Pagination.jsx";
+import { useAllBookings } from "./useAllBookings.js";
+import { useCabinsAll } from "../cabins/useCabinsAll.js";
 
 function BookingTable() {
   const { bookings, isLoading, count } = useBookings();
+  const { cabinsAll } = useCabinsAll();
   const [searchParams] = useSearchParams();
+  const { allBookings } = useAllBookings();
 
   if (isLoading) return <SpinnerMain />;
 
@@ -37,7 +40,7 @@ function BookingTable() {
             <Pagination count={count} />
           </Table.Footer>
         </Table>
-        {/* <Modal.Open opens={"addBooking"}>
+        <Modal.Open opens={"addBooking"}>
           <Menus.Button
             styleBox={""}
             styleSpan={
@@ -49,17 +52,16 @@ function BookingTable() {
           </Menus.Button>
         </Modal.Open>
 
-
         <Modal.Window cancelOutsideClick={true} name={"addBooking"}>
           <Form schemaType={"booking"}>
             <Form.Bookings
-              style={"bg-background-grey rounded-lg p-1 relative"}
+              style={"bg-background-grey rounded-lg p-1"}
               header={"Create-Booking"}
-              bookings={bookings}
-              cabins={cabins}
+              bookings={allBookings}
+              cabins={cabinsAll}
             />
           </Form>
-        </Modal.Window> */}
+        </Modal.Window>
       </Menus>
     </Modal>
   );

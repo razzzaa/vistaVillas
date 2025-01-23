@@ -8,22 +8,16 @@ export async function getGuests({ sort, page: { curPage, pageSize }, search }) {
   }
 
   if (search) {
-    console.log(search);
     query = query.or(`fullName.ilike.%${search}%,email.ilike.%${search}%`);
-    console.log(query);
   }
 
   if (curPage) {
     const from = (curPage - 1) * pageSize;
     const to = from + pageSize - 1;
-
-    console.log(from);
-    console.log(to);
     query = query.range(from, to);
   }
 
   const { data, error, count } = await query;
-  console.log(data);
 
   if (error) {
     console.error(error);

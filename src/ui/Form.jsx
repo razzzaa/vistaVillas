@@ -29,6 +29,8 @@ import { useUser } from "../features/authentication/useUser";
 import useUpdateUser from "../features/authentication/useUpdateUser";
 import { FaUserCheck } from "react-icons/fa6";
 import { MdOutlinePassword } from "react-icons/md";
+import { createPortal } from "react-dom";
+import { useBookings } from "../features/bookings/useBookings";
 
 const FormContext = createContext();
 
@@ -57,6 +59,7 @@ const StyledFormInput = styled.input`
   border-radius: 5px;
   padding: 0.2rem;
   box-shadow: var(--shadow-sm);
+  align-items: center;
 `;
 
 const StyledTextArea = styled.textarea`
@@ -84,6 +87,7 @@ function Form({
   const { id: editId, ...editData } = duplicateData;
 
   /*FORM SCHEMA TYPES-------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
   //CABIN
   //........................................................................................................................
   const cabinSchema = yup.object({
@@ -320,7 +324,9 @@ function Form({
         reset,
       }}
     >
-      <div className="max-h-[80vh] overflow-auto p-3">{children}</div>
+      <div className="flex max-h-[80vh] w-[100%] overflow-auto p-3">
+        <div className="grow">{children}</div>
+      </div>
     </FormContext.Provider>
   );
 }
@@ -852,148 +858,210 @@ function UpdateUserPassword({ style }) {
   );
 }
 
-// function Bookings({ style, header, bookings, selectRef, cabins }) {
-//   const { register, handleSubmit, errors, isEdited, editId, settings } =
-//     useContext(FormContext);
-//   const { guests } = useGuests();
-//   console.log(settings.maxGuestsPerBooking);
+function Bookings({ style, header, bookings, cabins }) {
+  const { register, handleSubmit, errors, isEdited, editId, settings } =
+    useContext(FormContext);
+  const { guests } = useGuests();
+  const datepickerRef = useRef(null);
+  const [selectedCabin, setSelectedCabin] = useState("");
+  const [selectedNumGuests, setSelectedNumGuests] = useState("");
+  const [value, setValue] = useState({
+    startDate: null,
+    endDate: null,
+  });
 
-//   //   console.log(guests);
+  console.log(datepickerRef);
 
-//   const guestsOptions = guests?.map((guest) => ({
-//     value: guest.fullName,
-//     label: guest.fullName, // Use the full name of the guest for the label
-//   }));
+  const guestsOptions = guests?.map((guest) => ({
+    value: guest.fullName,
+    label: guest.fullName, // Use the full name of the guest for the label
+  }));
 
-//   const maxGuestsOptions = Array.from(
-//     { length: settings.maxGuestsPerBooking },
-//     (_, index) => ({
-//       value: (index + 1).toString(), // Convert the number to a string (for value)
-//       label: (index + 1).toString(), // Convert the number to a string (for label)
-//     })
-//   );
+  const cabinsList = cabins.map((cabin) => {
+    return {
+      value: cabin.cabin_name,
+      label: `Cabin #${cabin.cabin_name} - for ${cabin.max_capacity} guests`,
+      numGuests: cabin.max_capacity,
+    };
+  });
 
-//   const cabinsList = cabins
-//     .map((cabin) => {
-//       if (cabin.availability === true) {
-//         return {
-//           value: cabin.cabin_name,
-//           label: cabin.cabin_name,
-//         };
-//       }
-//       return null; // If the cabin is not available, return null
-//     })
-//     .filter((cabin) => cabin !== null);
+  const numGuests = Array.from(
+    { length: selectedCabin.numGuests },
+    (_, index) => ({
+      value: (index + 1).toString(), // Convert the number to a string (for value)
+      label: (index + 1).toString(), // Convert the number to a string (for label)
+    })
+  );
 
-//   console.log(cabinsList);
+  const isPaid = [
+    { value: "true", label: "paid" },
+    { value: "false", label: "not-paid" },
+  ];
 
-//   const onSubmit = (data) => {
-//     if (isEdited) {
-//       console.log("ed");
-//     } else {
-//       console.log(data);
-//     }
-//   };
+  const onSubmit = (data) => {
+    if (isEdited) {
+      console.log("ed");
+    } else {
+      console.log(data);
+    }
+  };
 
-//   //GUESTS_SELECT
-//   {
-//     /* <label htmlFor="guestsNames" className="block text-sm font-medium text-gray-700 text-center">Guests</label>
-//               <Select
-//                 isMulti
-//                 name="guestsNames"
-//                 options={guestsOptions}
-//                 className="basic-multi-select"
-//                 classNamePrefix="select"
-//                 menuPortalTarget={document.body}
-//                 styles={{
-//                   menuPortal: (base) => ({
-//                     ...base,
-//                     zIndex: 9999,
-//                   }),
-//                 }}
-//               /> */
-//   }
+  function handleCabinSelect(val) {
+    setSelectedCabin(val);
+  }
 
-//   return (
-//     <form onSubmit={handleSubmit(onSubmit)}>
-//       <div className="flex justify-center">
-//         <Heading as="h3">{header}</Heading>
-//       </div>
-//       <div className={style}>
-//         <StyledFormUl>
-//           <StyledFormLi>
-//             <div className="p-4">
-//               <label
-//                 htmlFor="cabin"
-//                 className="block text-sm font-medium text-gray-700 text-center"
-//               >
-//                 Cabin
-//               </label>
-//               <Select
-//                 name="cabin"
-//                 options={cabinsList}
-//                 className="basic-multi-select"
-//                 classNamePrefix="select"
-//                 menuPortalTarget={document.body}
-//                 styles={{
-//                   menuPortal: (base) => ({
-//                     ...base,
-//                     zIndex: 9999,
-//                   }),
-//                 }}
-//               />
-//             </div>
-//             <div className="p-4">
-//               <label
-//                 htmlFor="guestsNames"
-//                 className="block text-sm font-medium text-gray-700 text-center"
-//               >
-//                 Number of Guests
-//               </label>
-//               <Select
-//                 name="maxGuests"
-//                 options={maxGuestsOptions}
-//                 className="basic-multi-select"
-//                 classNamePrefix="select"
-//                 menuPortalTarget={document.body}
-//                 styles={{
-//                   menuPortal: (base) => ({
-//                     ...base,
-//                     zIndex: 9999,
-//                   }),
-//                 }}
-//               />
-//             </div>
-//           </StyledFormLi>
-//           <div>
-//             <Select
-//               isMulti
-//               name="guests"
-//               options={guestsOptions}
-//               className="basic-multi-select"
-//               classNamePrefix="select"
-//               menuPortalTarget={document.body}
-//               styles={{
-//                 menuPortal: (base) => ({
-//                   ...base,
-//                   zIndex: 9999,
-//                 }),
-//               }}
-//             />
-//           </div>
-//         </StyledFormUl>
-//         <Button
-//           buttonContainer={"flex justify-center"}
-//           text={isEdited ? "SAVE" : "ADD"}
-//           icon={isEdited ? <MdSaveAs /> : <MdAddBusiness />}
-//           style={
-//             "flex justify-center items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md w-6/12"
-//           }
-//         />
-//       </div>
-//     </form>
-//   );
-// }
+  function handleNumGuestsSelect(val) {
+    setSelectedNumGuests(val);
+  }
+
+  const disabledDates = bookings.filter(
+    (takenDates) => takenDates.cabins.cabin_name === selectedCabin?.value
+  );
+
+  let disabledDatesArr = [];
+
+  if (disabledDates.length > 0) {
+    disabledDatesArr = disabledDates.map((date) => {
+      const [startDates, startTime] = date?.startDate.split("T") || [];
+      const [endDates, endTime] = date?.endDate.split("T") || [];
+
+      return {
+        startDate: new Date(startDates),
+        endDate: new Date(endDates),
+      };
+    });
+  }
+
+  useEffect(() => {
+    if (datepickerRef.current) {
+      createPopper(datepickerRef.current, document.body, {
+        placement: "right",
+      });
+    }
+  }, []);
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="flex justify-center">
+        <Heading as="h3">{header}</Heading>
+      </div>
+      <div className={style}>
+        <ul className="grid grid-cols-1 gap-3 m-4">
+          <li className="flex justify-between flex-1">
+            <label className="flex justify-center items-center" htmlFor="cabin">
+              Cabin:
+            </label>
+            <div className="w-[60%]">
+              <Select
+                {...register("cabin")}
+                name="cabin"
+                options={cabinsList}
+                className="basic-single"
+                classNamePrefix="select"
+                value={selectedCabin}
+                menuPortalTarget={document.body}
+                styles={{
+                  menuPortal: (base) => ({
+                    ...base,
+                    zIndex: 9999,
+                  }),
+                }}
+                onChange={(val) => handleCabinSelect(val)}
+              />
+            </div>
+          </li>
+
+          <li className="flex justify-between flex-1">
+            <label className="flex justify-center items-center" htmlFor="cabin">
+              Num of guest:
+            </label>
+            <div className="w-[60%]">
+              <Select
+                isDisabled={!selectedCabin}
+                {...register("cabin")}
+                name="cabin"
+                options={numGuests}
+                className="basic-single"
+                classNamePrefix="select"
+                value={selectedNumGuests}
+                menuPortalTarget={document.body}
+                styles={{
+                  menuPortal: (base) => ({
+                    ...base,
+                    zIndex: 9999,
+                  }),
+                }}
+                onChange={(val) => handleNumGuestsSelect(val)}
+              />
+            </div>
+          </li>
+          <li className="flex justify-between flex-1">
+            <label className="flex justify-center items-center" htmlFor="cabin">
+              Observations:
+            </label>
+            <div className="w-[60%]">
+              <StyledTextArea
+                disabled={!selectedCabin}
+                id="observations"
+                cols="25"
+                {...register("description")}
+              />
+            </div>
+          </li>
+          <li className="flex justify-between flex-1  items-center">
+            <label className="flex justify-center items-center" htmlFor="cabin">
+              Is-paid:
+            </label>
+            <div className="w-[60%]">
+              <Select
+                {...register("isPaid")}
+                isDisabled={!selectedCabin}
+                name="isPaid"
+                options={isPaid}
+                className="basic-single"
+                classNamePrefix="select"
+                menuPortalTarget={document.body}
+                styles={{
+                  menuPortal: (base) => ({
+                    ...base,
+                    zIndex: 9999,
+                  }),
+                }}
+              />
+            </div>
+          </li>
+          <li className="flex flex-1 items-center justify-between">
+            <div className="flex w-[100%]">
+              <label
+                className="flex justify-center items-center pr-4"
+                htmlFor="cabin"
+              >
+                Dates:
+              </label>
+              <Datepicker
+                disabledDates={disabledDatesArr}
+                startFrom={new Date()}
+                value={value}
+                onChange={(newValue) => setValue(newValue)}
+                primaryColor={"yellow"}
+                disabled={!selectedCabin}
+                containerClassName="flex items-end w-[100%] border rounded-md"
+              />
+            </div>
+          </li>
+        </ul>
+        <Button
+          buttonContainer={"flex justify-center"}
+          text={isEdited ? "SAVE" : "ADD"}
+          icon={isEdited ? <MdSaveAs /> : <MdAddBusiness />}
+          style={
+            "flex justify-center items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md w-6/12"
+          }
+        />
+      </div>
+    </form>
+  );
+}
 
 /* <img src={`https://flagsapi.com/${countryFlag}/shiny/24.png/`} />; */
 
@@ -1004,7 +1072,6 @@ Form.Login = Login;
 Form.Register = Register;
 Form.UpdateUserData = UpdateUserData;
 Form.UpdateUserPassword = UpdateUserPassword;
-
-// Form.Bookings = Bookings;
+Form.Bookings = Bookings;
 
 export default Form;

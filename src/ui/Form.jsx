@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
@@ -31,6 +31,8 @@ import { FaUserCheck } from "react-icons/fa6";
 import { MdOutlinePassword } from "react-icons/md";
 import { createPortal } from "react-dom";
 import { useBookings } from "../features/bookings/useBookings";
+import { GrFormNextLink } from "react-icons/gr";
+import useAddBooking from "../features/bookings/useAddBooking";
 
 const FormContext = createContext();
 
@@ -304,6 +306,7 @@ function Form({
     getValues,
     formState: { errors },
     reset,
+    control,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: isEdited ? editData : {},
@@ -322,6 +325,7 @@ function Form({
         onCloseModal,
         settings,
         reset,
+        control,
       }}
     >
       <div className="flex max-h-[80vh] w-[100%] overflow-auto p-3">
@@ -859,8 +863,16 @@ function UpdateUserPassword({ style }) {
 }
 
 function Bookings({ style, header, bookings, cabins }) {
-  const { register, handleSubmit, errors, isEdited, editId, settings } =
-    useContext(FormContext);
+  const { addBooking } = useAddBooking();
+  const {
+    register,
+    handleSubmit,
+    errors,
+    isEdited,
+    editId,
+    settings,
+    control,
+  } = useContext(FormContext);
   const { guests } = useGuests();
   const datepickerRef = useRef(null);
   const [selectedCabin, setSelectedCabin] = useState("");
@@ -869,8 +881,6 @@ function Bookings({ style, header, bookings, cabins }) {
     startDate: null,
     endDate: null,
   });
-
-  console.log(datepickerRef);
 
   const guestsOptions = guests?.map((guest) => ({
     value: guest.fullName,
@@ -882,6 +892,7 @@ function Bookings({ style, header, bookings, cabins }) {
       value: cabin.cabin_name,
       label: `Cabin #${cabin.cabin_name} - for ${cabin.max_capacity} guests`,
       numGuests: cabin.max_capacity,
+      cabinId: cabin.id,
     };
   });
 
@@ -894,24 +905,22 @@ function Bookings({ style, header, bookings, cabins }) {
   );
 
   const isPaid = [
-    { value: "true", label: "paid" },
-    { value: "false", label: "not-paid" },
+    { value: "TRUE", label: "YES" },
+    { value: "FALSE", label: "NO" },
   ];
 
   const onSubmit = (data) => {
-    if (isEdited) {
-      console.log("ed");
-    } else {
-      console.log(data);
-    }
+    console.log(data);
+    const {
+      cabin: { cabinId },
+      datePicker: { endDate },
+      datePicker: { startDate },
+      numGuests: { value },
+    } = data;
   };
 
   function handleCabinSelect(val) {
     setSelectedCabin(val);
-  }
-
-  function handleNumGuestsSelect(val) {
-    setSelectedNumGuests(val);
   }
 
   const disabledDates = bookings.filter(
@@ -932,14 +941,6 @@ function Bookings({ style, header, bookings, cabins }) {
     });
   }
 
-  useEffect(() => {
-    if (datepickerRef.current) {
-      createPopper(datepickerRef.current, document.body, {
-        placement: "right",
-      });
-    }
-  }, []);
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex justify-center">
@@ -952,21 +953,28 @@ function Bookings({ style, header, bookings, cabins }) {
               Cabin:
             </label>
             <div className="w-[60%]">
-              <Select
-                {...register("cabin")}
+              <Controller
                 name="cabin"
-                options={cabinsList}
-                className="basic-single"
-                classNamePrefix="select"
-                value={selectedCabin}
-                menuPortalTarget={document.body}
-                styles={{
-                  menuPortal: (base) => ({
-                    ...base,
-                    zIndex: 9999,
-                  }),
-                }}
-                onChange={(val) => handleCabinSelect(val)}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    name="cabin"
+                    options={cabinsList}
+                    className="basic-single"
+                    classNamePrefix="select"
+                    value={value}
+                    menuPortalTarget={document.body}
+                    styles={{
+                      menuPortal: (base) => ({
+                        ...base,
+                        zIndex: 9999,
+                      }),
+                    }}
+                    onChange={(value) => {
+                      handleCabinSelect(value), onChange(value);
+                    }}
+                  />
+                )}
               />
             </div>
           </li>
@@ -976,22 +984,28 @@ function Bookings({ style, header, bookings, cabins }) {
               Num of guest:
             </label>
             <div className="w-[60%]">
-              <Select
-                isDisabled={!selectedCabin}
-                {...register("cabin")}
-                name="cabin"
-                options={numGuests}
-                className="basic-single"
-                classNamePrefix="select"
-                value={selectedNumGuests}
-                menuPortalTarget={document.body}
-                styles={{
-                  menuPortal: (base) => ({
-                    ...base,
-                    zIndex: 9999,
-                  }),
-                }}
-                onChange={(val) => handleNumGuestsSelect(val)}
+              <Controller
+                name="numGuests"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    isDisabled={!selectedCabin}
+                    name="numGuests"
+                    options={numGuests}
+                    className="basic-single"
+                    classNamePrefix="select"
+                    menuPortalTarget={document.body}
+                    styles={{
+                      menuPortal: (base) => ({
+                        ...base,
+                        zIndex: 9999,
+                      }),
+                    }}
+                    onChange={(value) => {
+                      onChange(value);
+                    }}
+                  />
+                )}
               />
             </div>
           </li>
@@ -1001,10 +1015,10 @@ function Bookings({ style, header, bookings, cabins }) {
             </label>
             <div className="w-[60%]">
               <StyledTextArea
+                {...register("observations")}
                 disabled={!selectedCabin}
                 id="observations"
                 cols="25"
-                {...register("description")}
               />
             </div>
           </li>
@@ -1013,20 +1027,26 @@ function Bookings({ style, header, bookings, cabins }) {
               Is-paid:
             </label>
             <div className="w-[60%]">
-              <Select
-                {...register("isPaid")}
-                isDisabled={!selectedCabin}
+              <Controller
                 name="isPaid"
-                options={isPaid}
-                className="basic-single"
-                classNamePrefix="select"
-                menuPortalTarget={document.body}
-                styles={{
-                  menuPortal: (base) => ({
-                    ...base,
-                    zIndex: 9999,
-                  }),
-                }}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    isDisabled={!selectedCabin}
+                    name="isPaid"
+                    options={isPaid}
+                    className="basic-single"
+                    classNamePrefix="select"
+                    menuPortalTarget={document.body}
+                    styles={{
+                      menuPortal: (base) => ({
+                        ...base,
+                        zIndex: 9999,
+                      }),
+                    }}
+                    onChange={(value) => onChange(value)}
+                  />
+                )}
               />
             </div>
           </li>
@@ -1038,24 +1058,31 @@ function Bookings({ style, header, bookings, cabins }) {
               >
                 Dates:
               </label>
-              <Datepicker
-                disabledDates={disabledDatesArr}
-                startFrom={new Date()}
-                value={value}
-                onChange={(newValue) => setValue(newValue)}
-                primaryColor={"yellow"}
-                disabled={!selectedCabin}
-                containerClassName="flex items-end w-[100%] border rounded-md"
+              <Controller
+                name="datePicker"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Datepicker
+                    name="datePicker"
+                    disabledDates={disabledDatesArr}
+                    startFrom={new Date()}
+                    value={value}
+                    onChange={(value) => onChange(value)}
+                    primaryColor={"yellow"}
+                    disabled={!selectedCabin}
+                    containerClassName="flex items-end w-[100%] border rounded-md"
+                  />
+                )}
               />
             </div>
           </li>
         </ul>
         <Button
           buttonContainer={"flex justify-center"}
-          text={isEdited ? "SAVE" : "ADD"}
-          icon={isEdited ? <MdSaveAs /> : <MdAddBusiness />}
+          text={"NEXT"}
+          icon={<GrFormNextLink />}
           style={
-            "flex justify-center items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:bg-dark-yellow hover:text-white shadow-md w-6/12"
+            "flex w-[20%] justify-center items-center my-2 p-2 bg-[var(--color-green-bright)] rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md w-6/12"
           }
         />
       </div>

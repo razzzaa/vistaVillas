@@ -1,6 +1,8 @@
 import { supabase, supabaseUrl, supabaseKey } from "./supabase";
 
-export async function getGuests({ sort, page: { curPage, pageSize }, search }) {
+const PAGE_SIZE = 15;
+
+export async function getGuests({ sort, page, search }) {
   let query = supabase.from("guests").select("*", { count: "exact" });
 
   if (sort) {
@@ -11,9 +13,9 @@ export async function getGuests({ sort, page: { curPage, pageSize }, search }) {
     query = query.or(`fullName.ilike.%${search}%,email.ilike.%${search}%`);
   }
 
-  if (curPage) {
-    const from = (curPage - 1) * pageSize;
-    const to = from + pageSize - 1;
+  if (page) {
+    const from = (page.curPage - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
     query = query.range(from, to);
   }
 
@@ -23,7 +25,7 @@ export async function getGuests({ sort, page: { curPage, pageSize }, search }) {
     console.error(error);
   }
 
-  return { data, count, pageSize };
+  return { data, count, PAGE_SIZE };
 }
 
 export async function addEditGuests(newGuest, id) {
@@ -35,7 +37,6 @@ export async function addEditGuests(newGuest, id) {
       .insert({ ...newGuest })
       .select()
       .single();
-    console.log(guest);
     if (error) {
       console.log(error);
     }
@@ -43,7 +44,6 @@ export async function addEditGuests(newGuest, id) {
 
   if (id) {
     console.log("there is an id");
-    console.log(id);
     const { data: guest, error } = await supabase
       .from("guests")
       .update({ ...newGuest })

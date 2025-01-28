@@ -33,6 +33,8 @@ import { createPortal } from "react-dom";
 import { useBookings } from "../features/bookings/useBookings";
 import { GrFormNextLink } from "react-icons/gr";
 import useAddBooking from "../features/bookings/useAddBooking";
+import { GrFormPreviousLink } from "react-icons/gr";
+import { useGetAllGuests } from "../features/guests/useGetAllGuests";
 
 const FormContext = createContext();
 
@@ -217,7 +219,11 @@ function Form({
 
   //BOOKING
   //............................................................................................................................
-  const bookingSchema = yup.object({});
+  const bookingSchema = yup.object({
+    cabin: yup.object().required("This Field is required"),
+    numGuests: yup.object().required("This Field is required"),
+    datePicker: yup.object().required("Date is required"),
+  });
   //............................................................................................................................
 
   //LOGIN
@@ -863,7 +869,6 @@ function UpdateUserPassword({ style }) {
 }
 
 function Bookings({ style, header, bookings, cabins }) {
-  const { addBooking } = useAddBooking();
   const {
     register,
     handleSubmit,
@@ -873,19 +878,16 @@ function Bookings({ style, header, bookings, cabins }) {
     settings,
     control,
   } = useContext(FormContext);
-  const { guests } = useGuests();
-  const datepickerRef = useRef(null);
-  const [selectedCabin, setSelectedCabin] = useState("");
-  const [selectedNumGuests, setSelectedNumGuests] = useState("");
   const [value, setValue] = useState({
     startDate: null,
     endDate: null,
   });
 
-  const guestsOptions = guests?.map((guest) => ({
-    value: guest.fullName,
-    label: guest.fullName, // Use the full name of the guest for the label
-  }));
+  const { addBooking } = useAddBooking();
+  const [selectedCabin, setSelectedCabin] = useState("");
+  const [selectedNumGuests, setSelectedNumGuests] = useState("");
+  const [isLastBookingPage, setIsLastBookingPage] = useState(false);
+  const { guests } = useGetAllGuests();
 
   const cabinsList = cabins.map((cabin) => {
     return {
@@ -909,14 +911,34 @@ function Bookings({ style, header, bookings, cabins }) {
     { value: "FALSE", label: "NO" },
   ];
 
+  const guestsOptions = guests?.map((guest) => ({
+    value: guest.fullName,
+    label: guest.fullName,
+  }));
+
+  console.log(guestsOptions);
+
   const onSubmit = (data) => {
     console.log(data);
     const {
       cabin: { cabinId },
       datePicker: { endDate },
       datePicker: { startDate },
-      numGuests: { value },
+      numGuests: { value: numGuests },
+      isPaid: { value: isPaid } = {},
+      observations: observation,
     } = data;
+
+    const newBooking = {
+      cabinId,
+      startDate,
+      endDate,
+      numGuests,
+      isPaid,
+      observation,
+    };
+
+    console.log(newBooking);
   };
 
   function handleCabinSelect(val) {
@@ -942,151 +964,199 @@ function Bookings({ style, header, bookings, cabins }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex justify-center">
-        <Heading as="h3">{header}</Heading>
-      </div>
-      <div className={style}>
-        <ul className="grid grid-cols-1 gap-3 m-4">
-          <li className="flex justify-between flex-1">
-            <label className="flex justify-center items-center" htmlFor="cabin">
-              Cabin:
-            </label>
-            <div className="w-[60%]">
-              <Controller
-                name="cabin"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Select
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex justify-center">
+          <Heading as="h3">{header}</Heading>
+        </div>
+        <div className={style}>
+          {isLastBookingPage ? (
+            <ul className="grid grid-cols-1 gap-3 m-4">
+              <li className="flex justify-between flex-1">
+                <label
+                  className="flex justify-center items-center"
+                  htmlFor="cabin"
+                >
+                  Select-Guests:
+                </label>
+                <div className="w-[60%]">
+                  <Controller
+                    name="guests"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <Select
+                        name="guests"
+                        options={guestsOptions}
+                        isMulti
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        value={value}
+                        menuPortalTarget={document.body}
+                        styles={{
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999,
+                          }),
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+              </li>
+              <li className="flex justify-between flex-1"></li>
+              <li className="flex justify-between flex-1"></li>
+            </ul>
+          ) : (
+            <ul className="grid grid-cols-1 gap-3 m-4">
+              <li className="flex justify-between flex-1">
+                <label
+                  className="flex justify-center items-center"
+                  htmlFor="cabin"
+                >
+                  Cabin:
+                </label>
+                <div className="w-[60%]">
+                  <Controller
                     name="cabin"
-                    options={cabinsList}
-                    className="basic-single"
-                    classNamePrefix="select"
-                    value={value}
-                    menuPortalTarget={document.body}
-                    styles={{
-                      menuPortal: (base) => ({
-                        ...base,
-                        zIndex: 9999,
-                      }),
-                    }}
-                    onChange={(value) => {
-                      handleCabinSelect(value), onChange(value);
-                    }}
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <Select
+                        name="cabin"
+                        options={cabinsList}
+                        className="basic-single"
+                        classNamePrefix="select"
+                        value={value}
+                        menuPortalTarget={document.body}
+                        styles={{
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999,
+                          }),
+                        }}
+                        onChange={(value) => {
+                          handleCabinSelect(value), onChange(value);
+                        }}
+                      />
+                    )}
                   />
-                )}
-              />
-            </div>
-          </li>
+                  <p className="text-red-500">{errors.cabin?.message}</p>
+                </div>
+              </li>
 
-          <li className="flex justify-between flex-1">
-            <label className="flex justify-center items-center" htmlFor="cabin">
-              Num of guest:
-            </label>
-            <div className="w-[60%]">
-              <Controller
-                name="numGuests"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    isDisabled={!selectedCabin}
+              <li className="flex justify-between flex-1">
+                <label
+                  className="flex justify-center items-center"
+                  htmlFor="cabin"
+                >
+                  Num of guest:
+                </label>
+                <div className="w-[60%]">
+                  <Controller
                     name="numGuests"
-                    options={numGuests}
-                    className="basic-single"
-                    classNamePrefix="select"
-                    menuPortalTarget={document.body}
-                    styles={{
-                      menuPortal: (base) => ({
-                        ...base,
-                        zIndex: 9999,
-                      }),
-                    }}
-                    onChange={(value) => {
-                      onChange(value);
-                    }}
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <Select
+                        isDisabled={!selectedCabin}
+                        name="numGuests"
+                        options={numGuests}
+                        className="basic-single"
+                        classNamePrefix="select"
+                        menuPortalTarget={document.body}
+                        styles={{
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999,
+                          }),
+                        }}
+                        onChange={(value) => {
+                          onChange(value);
+                        }}
+                      />
+                    )}
                   />
-                )}
-              />
-            </div>
-          </li>
-          <li className="flex justify-between flex-1">
-            <label className="flex justify-center items-center" htmlFor="cabin">
-              Observations:
-            </label>
-            <div className="w-[60%]">
-              <StyledTextArea
-                {...register("observations")}
-                disabled={!selectedCabin}
-                id="observations"
-                cols="25"
-              />
-            </div>
-          </li>
-          <li className="flex justify-between flex-1  items-center">
-            <label className="flex justify-center items-center" htmlFor="cabin">
-              Is-paid:
-            </label>
-            <div className="w-[60%]">
-              <Controller
-                name="isPaid"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Select
-                    isDisabled={!selectedCabin}
-                    name="isPaid"
-                    options={isPaid}
-                    className="basic-single"
-                    classNamePrefix="select"
-                    menuPortalTarget={document.body}
-                    styles={{
-                      menuPortal: (base) => ({
-                        ...base,
-                        zIndex: 9999,
-                      }),
-                    }}
-                    onChange={(value) => onChange(value)}
-                  />
-                )}
-              />
-            </div>
-          </li>
-          <li className="flex flex-1 items-center justify-between">
-            <div className="flex w-[100%]">
-              <label
-                className="flex justify-center items-center pr-4"
-                htmlFor="cabin"
-              >
-                Dates:
-              </label>
-              <Controller
-                name="datePicker"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Datepicker
-                    name="datePicker"
-                    disabledDates={disabledDatesArr}
-                    startFrom={new Date()}
-                    value={value}
-                    onChange={(value) => onChange(value)}
-                    primaryColor={"yellow"}
+                  <p className="text-red-500">{errors.numGuests?.message}</p>
+                </div>
+              </li>
+              <li className="flex justify-between flex-1">
+                <label
+                  className="flex justify-center items-center"
+                  htmlFor="cabin"
+                >
+                  Observations:
+                </label>
+                <div className="w-[60%]">
+                  <StyledTextArea
+                    {...register("observations")}
                     disabled={!selectedCabin}
-                    containerClassName="flex items-end w-[100%] border rounded-md"
+                    id="observations"
+                    cols="25"
                   />
-                )}
-              />
-            </div>
-          </li>
-        </ul>
-        <Button
-          buttonContainer={"flex justify-center"}
-          text={"NEXT"}
-          icon={<GrFormNextLink />}
-          style={
-            "flex w-[20%] justify-center items-center my-2 p-2 bg-[var(--color-green-bright)] rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md w-6/12"
-          }
-        />
-      </div>
-    </form>
+                </div>
+              </li>
+              <li className="flex justify-between flex-1  items-center">
+                <label
+                  className="flex justify-center items-center"
+                  htmlFor="cabin"
+                >
+                  Is-paid:
+                </label>
+                <div className="w-[60%]">
+                  <Controller
+                    name="isPaid"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <Select
+                        isDisabled={!selectedCabin}
+                        name="isPaid"
+                        options={isPaid}
+                        className="basic-single"
+                        classNamePrefix="select"
+                        menuPortalTarget={document.body}
+                        styles={{
+                          menuPortal: (base) => ({
+                            ...base,
+                            zIndex: 9999,
+                          }),
+                        }}
+                        onChange={(value) => onChange(value)}
+                      />
+                    )}
+                  />
+                </div>
+              </li>
+              <li className="flex flex-col flex-1 items-start justify-between">
+                <Controller
+                  name="datePicker"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <Datepicker
+                      name="datePicker"
+                      disabledDates={disabledDatesArr}
+                      startFrom={new Date()}
+                      value={value}
+                      onChange={(value) => onChange(value)}
+                      primaryColor={"yellow"}
+                      disabled={!selectedCabin}
+                      containerClassName="flex items-end w-[100%] border rounded-md"
+                    />
+                  )}
+                />
+                <p className="text-red-500 ">{errors.datePicker?.message}</p>
+              </li>
+            </ul>
+          )}
+        </div>
+      </form>
+      <Button
+        buttonContainer={"flex justify-center"}
+        text={isLastBookingPage ? "BACK" : "NEXT"}
+        icon={isLastBookingPage ? <GrFormPreviousLink /> : <GrFormNextLink />}
+        style={
+          "flex w-[20%] justify-center items-center my-2 p-2 bg-[var(--color-green-bright)] rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md w-6/12"
+        }
+        onClick={() => setIsLastBookingPage(!isLastBookingPage)}
+      />
+    </>
   );
 }
 

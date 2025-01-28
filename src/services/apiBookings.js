@@ -51,7 +51,9 @@ export async function getBookingsById(id) {
   return booking;
 }
 
-export async function addEditookings(newBooking, id) {
+export async function addEditBookings(newBooking, id) {
+  console.log(newBooking);
+
   if (!id) {
     console.log("no id");
     console.log(newBooking);
@@ -69,6 +71,7 @@ export async function addEditookings(newBooking, id) {
   if (id) {
     console.log("there is an id");
     console.log(id);
+    console.log(newBooking);
     const { data: booking, error } = await supabase
       .from("bookings")
       .update({ ...newBooking })

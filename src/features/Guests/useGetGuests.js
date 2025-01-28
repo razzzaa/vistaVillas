@@ -20,13 +20,12 @@ export function useGuests() {
   /* pagination.................................................................................................................................... */
   const page = {
     curPage: !searchParams.get("page") ? 1 : Number(searchParams.get("page")),
-    pageSize: 15,
   };
 
   /*............................................................................................................................................... */
 
   const {
-    data: { data: guests, count, pageSize } = {},
+    data: { data: guests, count, PAGE_SIZE } = {},
     isLoading,
     error,
   } = useQuery({
@@ -34,5 +33,7 @@ export function useGuests() {
     queryFn: () => getGuests({ sort, page, search }),
   });
 
-  return { guests, isLoading, error, count, pageSize };
+  console.log(guests);
+
+  return { guests, isLoading, error, count, PAGE_SIZE };
 }

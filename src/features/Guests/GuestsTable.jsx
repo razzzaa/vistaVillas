@@ -11,9 +11,9 @@ import { useGuests } from "./useGetGuests";
 import { RiPlayListAddLine } from "react-icons/ri";
 
 function GuestsTable() {
-  const { guests, isLoading, error, count, pageSize } = useGuests();
-  console.log(guests);
+  const { guests, isLoading, error, count, PAGE_SIZE } = useGuests();
   //   const { CurSearchValue } = useSearchValues();
+  console.log(PAGE_SIZE);
 
   if (isLoading) return <SpinnerMain />;
 
@@ -48,7 +48,7 @@ function GuestsTable() {
               ))}
             </Table.Body>
             <Table.Footer>
-              <Pagination count={count} pageSize={pageSize} />
+              <Pagination count={count} pageSize={PAGE_SIZE} />
             </Table.Footer>
           </Table>
           <Modal.Open opens={"addGuest"}>

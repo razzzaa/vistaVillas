@@ -35,6 +35,7 @@ import { GrFormNextLink } from "react-icons/gr";
 import useAddBooking from "../features/bookings/useAddBooking";
 import { GrFormPreviousLink } from "react-icons/gr";
 import { useGetAllGuests } from "../features/guests/useGetAllGuests";
+import { IoMdCheckmark } from "react-icons/io";
 
 const FormContext = createContext();
 
@@ -916,8 +917,6 @@ function Bookings({ style, header, bookings, cabins }) {
     label: guest.fullName,
   }));
 
-  console.log(guestsOptions);
-
   const onSubmit = (data) => {
     console.log(data);
     const {
@@ -938,7 +937,9 @@ function Bookings({ style, header, bookings, cabins }) {
       observation,
     };
 
-    console.log(newBooking);
+    const newBookingGuests = {};
+
+    console.log(data);
   };
 
   function handleCabinSelect(val) {
@@ -998,6 +999,9 @@ function Bookings({ style, header, bookings, cabins }) {
                             zIndex: 9999,
                           }),
                         }}
+                        onChange={(value) => {
+                          onChange(value);
+                        }}
                       />
                     )}
                   />
@@ -1005,6 +1009,26 @@ function Bookings({ style, header, bookings, cabins }) {
               </li>
               <li className="flex justify-between flex-1"></li>
               <li className="flex justify-between flex-1"></li>
+              <div className="flex justify-center">
+                <Button
+                  buttonContainer={"flex justify-center px-2"}
+                  text={"BACK"}
+                  icon={<GrFormPreviousLink />}
+                  style={
+                    "flex justify-center items-center my-2 p-2 bg-[var(--color-green-bright)] rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md"
+                  }
+                  onClick={() => setIsLastBookingPage(!isLastBookingPage)}
+                />
+                <Button
+                  buttonContainer={"flex justify-center px-2"}
+                  text={"SUBMIT"}
+                  icon={<IoMdCheckmark />}
+                  style={
+                    "flex justify-center items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md"
+                  }
+                  onClick={() => setIsLastBookingPage(!isLastBookingPage)}
+                />
+              </div>
             </ul>
           ) : (
             <ul className="grid grid-cols-1 gap-3 m-4">
@@ -1147,15 +1171,17 @@ function Bookings({ style, header, bookings, cabins }) {
           )}
         </div>
       </form>
-      <Button
-        buttonContainer={"flex justify-center"}
-        text={isLastBookingPage ? "BACK" : "NEXT"}
-        icon={isLastBookingPage ? <GrFormPreviousLink /> : <GrFormNextLink />}
-        style={
-          "flex w-[20%] justify-center items-center my-2 p-2 bg-[var(--color-green-bright)] rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md w-6/12"
-        }
-        onClick={() => setIsLastBookingPage(!isLastBookingPage)}
-      />
+      {!isLastBookingPage && (
+        <Button
+          buttonContainer={"flex justify-center"}
+          text={isLastBookingPage ? "BACK" : "NEXT"}
+          icon={isLastBookingPage ? <GrFormPreviousLink /> : <GrFormNextLink />}
+          style={
+            "flex w-[20%] justify-center items-center my-2 p-2 bg-[var(--color-green-bright)] rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md w-6/12"
+          }
+          onClick={() => setIsLastBookingPage(!isLastBookingPage)}
+        />
+      )}
     </>
   );
 }

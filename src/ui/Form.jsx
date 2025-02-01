@@ -221,9 +221,10 @@ function Form({
   //BOOKING
   //............................................................................................................................
   const bookingSchema = yup.object({
-    cabin: yup.object().required("This Field is required"),
-    numGuests: yup.object().required("This Field is required"),
-    datePicker: yup.object().required("Date is required"),
+    cabin: yup.object().required("*Cabin Field is required"),
+    numGuests: yup.object().required("*Number of guests Field is required"),
+    datePicker: yup.object().required("*Date is required"),
+    guests: yup.array().required("*Guests Field is required"),
   });
   //............................................................................................................................
 
@@ -878,16 +879,20 @@ function Bookings({ style, header, bookings, cabins }) {
     editId,
     settings,
     control,
+    onCloseModal,
   } = useContext(FormContext);
   const [value, setValue] = useState({
     startDate: null,
     endDate: null,
   });
 
-  const { addBooking } = useAddBooking();
   const [selectedCabin, setSelectedCabin] = useState("");
   const [selectedNumGuests, setSelectedNumGuests] = useState("");
   const [isLastBookingPage, setIsLastBookingPage] = useState(false);
+  const [guestsLocal, setGuestsLocal] = useState([]);
+
+  const { addBooking, isUpdating } = useAddBooking();
+
   const { guests } = useGetAllGuests();
 
   const cabinsList = cabins.map((cabin) => {
@@ -915,10 +920,25 @@ function Bookings({ style, header, bookings, cabins }) {
   const guestsOptions = guests?.map((guest) => ({
     value: guest.fullName,
     label: guest.fullName,
+    id: guest.id,
   }));
 
   const onSubmit = (data) => {
-    console.log(data);
+    const breakfast = {};
+
+    guestsLocal.map((guest) => {
+      const guestName = guest.value;
+      const guestId = guest.id;
+
+      // If the guest's name exists in the main object (data), move it to the breakfast object
+      if (data[guestName]) {
+        breakfast[guestId] = data[guestName];
+        delete data[guestName];
+      }
+    });
+
+    const newData = { ...data, breakfast };
+
     const {
       cabin: { cabinId },
       datePicker: { endDate },
@@ -926,7 +946,7 @@ function Bookings({ style, header, bookings, cabins }) {
       numGuests: { value: numGuests },
       isPaid: { value: isPaid } = {},
       observations: observation,
-    } = data;
+    } = newData;
 
     const newBooking = {
       cabinId,
@@ -937,9 +957,14 @@ function Bookings({ style, header, bookings, cabins }) {
       observation,
     };
 
-    const newBookingGuests = {};
-
-    console.log(data);
+    addBooking(
+      { newBooking, newBookingGuestsData: breakfast },
+      {
+        onSuccess: () => {
+          onCloseModal?.();
+        },
+      }
+    );
   };
 
   function handleCabinSelect(val) {
@@ -971,12 +996,12 @@ function Bookings({ style, header, bookings, cabins }) {
           <Heading as="h3">{header}</Heading>
         </div>
         <div className={style}>
-          {isLastBookingPage ? (
+          {isLastBookingPage && (
             <ul className="grid grid-cols-1 gap-3 m-4">
               <li className="flex justify-between flex-1">
                 <label
                   className="flex justify-center items-center"
-                  htmlFor="cabin"
+                  htmlFor="guests"
                 >
                   Select-Guests:
                 </label>
@@ -986,12 +1011,19 @@ function Bookings({ style, header, bookings, cabins }) {
                     control={control}
                     render={({ field: { onChange, value } }) => (
                       <Select
+                        onChange={(value) => {
+                          if (value.length <= selectedNumGuests.value) {
+                            onChange(value);
+                            setGuestsLocal(value);
+                          }
+                        }}
+                        isDisabled={!selectedNumGuests}
                         name="guests"
                         options={guestsOptions}
                         isMulti
+                        value={value}
                         className="basic-multi-select"
                         classNamePrefix="select"
-                        value={value}
                         menuPortalTarget={document.body}
                         styles={{
                           menuPortal: (base) => ({
@@ -999,38 +1031,72 @@ function Bookings({ style, header, bookings, cabins }) {
                             zIndex: 9999,
                           }),
                         }}
-                        onChange={(value) => {
-                          onChange(value);
-                        }}
                       />
                     )}
                   />
+                  <p className="text-red-500">{errors.guests?.message}</p>
                 </div>
               </li>
-              <li className="flex justify-between flex-1"></li>
-              <li className="flex justify-between flex-1"></li>
+              <div> Breakfast:</div>
+              <div className="flex border">
+                {guestsLocal.map((guest) => (
+                  <fieldset className="p-2" key={guest.id}>
+                    <legend className="text-md font-bold">
+                      {guest.value}:
+                    </legend>
+                    <ul>
+                      <li className="px-2 text-sm">
+                        <input
+                          type="radio"
+                          id={`W${guest.id}`}
+                          name={guest.value}
+                          value="TRUE"
+                          {...register(guest.value)}
+                        />
+                        <label htmlFor="wBreak"> YES</label>
+                      </li>
+                      <li className="px-2 text-sm">
+                        <input
+                          type="radio"
+                          id={`n${guest.id}`}
+                          name={guest.value}
+                          value="FALSE"
+                          {...register(guest.value)}
+                        />
+                        <label htmlFor="nBreak"> NO</label>
+                      </li>
+                    </ul>
+                  </fieldset>
+                ))}
+              </div>
+              <div>
+                <p className="text-red-500 ">{errors.cabin?.message}</p>
+                <p className="text-red-500 ">{errors.numGuests?.message}</p>
+                <p className="text-red-500 ">{errors.datePicker?.message}</p>
+              </div>
               <div className="flex justify-center">
                 <Button
-                  buttonContainer={"flex justify-center px-2"}
+                  buttonContainer={"flex justify-center px-2 w-[30%]"}
                   text={"BACK"}
                   icon={<GrFormPreviousLink />}
                   style={
-                    "flex justify-center items-center my-2 p-2 bg-[var(--color-green-bright)] rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md"
+                    "flex justify-center items-center my-2 p-2 bg-[var(--color-green-bright)] rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md w-[100%]"
                   }
                   onClick={() => setIsLastBookingPage(!isLastBookingPage)}
                 />
                 <Button
-                  buttonContainer={"flex justify-center px-2"}
+                  buttonContainer={"flex justify-center px-2 w-[30%]"}
                   text={"SUBMIT"}
                   icon={<IoMdCheckmark />}
                   style={
-                    "flex justify-center items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md"
+                    "flex justify-center items-center my-2 p-2 bg-medium-yellow rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md w-[100%]"
                   }
-                  onClick={() => setIsLastBookingPage(!isLastBookingPage)}
                 />
               </div>
             </ul>
-          ) : (
+          )}
+
+          {!isLastBookingPage && (
             <ul className="grid grid-cols-1 gap-3 m-4">
               <li className="flex justify-between flex-1">
                 <label
@@ -1058,7 +1124,8 @@ function Bookings({ style, header, bookings, cabins }) {
                           }),
                         }}
                         onChange={(value) => {
-                          handleCabinSelect(value), onChange(value);
+                          handleCabinSelect(value);
+                          onChange(value);
                         }}
                       />
                     )}
@@ -1083,6 +1150,7 @@ function Bookings({ style, header, bookings, cabins }) {
                         isDisabled={!selectedCabin}
                         name="numGuests"
                         options={numGuests}
+                        value={value}
                         className="basic-single"
                         classNamePrefix="select"
                         menuPortalTarget={document.body}
@@ -1094,6 +1162,7 @@ function Bookings({ style, header, bookings, cabins }) {
                         }}
                         onChange={(value) => {
                           onChange(value);
+                          setSelectedNumGuests(value);
                         }}
                       />
                     )}
@@ -1170,18 +1239,20 @@ function Bookings({ style, header, bookings, cabins }) {
             </ul>
           )}
         </div>
+        {!isLastBookingPage && (
+          <Button
+            buttonContainer={"flex justify-center"}
+            text={isLastBookingPage ? "BACK" : "NEXT"}
+            icon={
+              isLastBookingPage ? <GrFormPreviousLink /> : <GrFormNextLink />
+            }
+            style={
+              "flex w-[20%] justify-center items-center my-2 p-2 bg-[var(--color-green-bright)] rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md w-6/12"
+            }
+            onClick={() => setIsLastBookingPage(!isLastBookingPage)}
+          />
+        )}
       </form>
-      {!isLastBookingPage && (
-        <Button
-          buttonContainer={"flex justify-center"}
-          text={isLastBookingPage ? "BACK" : "NEXT"}
-          icon={isLastBookingPage ? <GrFormPreviousLink /> : <GrFormNextLink />}
-          style={
-            "flex w-[20%] justify-center items-center my-2 p-2 bg-[var(--color-green-bright)] rounded-md text-darker-yellow font-bold text-md transition-all hover:text-white shadow-md w-6/12"
-          }
-          onClick={() => setIsLastBookingPage(!isLastBookingPage)}
-        />
-      )}
     </>
   );
 }

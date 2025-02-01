@@ -6,10 +6,13 @@ function useAddBooking() {
   const queryClient = useQueryClient();
 
   const { mutate: addBooking, isPending: isUpdating } = useMutation({
-    mutationFn: (newBookingData) => apiAddBooking(newBookingData),
+    mutationFn: ({ newBooking, newBookingGuestsData, id = null }) =>
+      apiAddBooking({ newBooking, newBookingGuestsData, id }),
     onSuccess: () => {
       toast.success("Booking-Added");
-      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({
+        queryKey: ["bookings"],
+      });
     },
     onError: (err) => {
       console.error(err.message);

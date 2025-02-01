@@ -10,14 +10,18 @@ import { RiPlayListAddLine } from "react-icons/ri";
 import Pagination from "../../ui/Pagination.jsx";
 import { useAllBookings } from "./useAllBookings.js";
 import { useCabinsAll } from "../cabins/useCabinsAll.js";
+import useAddBooking from "./useAddBooking.js";
 
 function BookingTable() {
   const { bookings, isLoading, count } = useBookings();
   const { cabinsAll } = useCabinsAll();
   const [searchParams] = useSearchParams();
   const { allBookings } = useAllBookings();
+  const { isUpdating } = useAddBooking();
 
   if (isLoading) return <SpinnerMain />;
+
+  if (isUpdating) return <SpinnerMain />;
 
   return (
     <Modal>

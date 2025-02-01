@@ -15,60 +15,6 @@ function CabinTable() {
 
   if (isLoading) return <SpinnerMain />;
 
-  // const filterValue = searchParams.get("discount-availability") || "all";
-
-  // let filteredValue;
-  // if (filterValue === "all") {
-  //   filteredValue = cabins;
-  //   console.log(filteredValue);
-  // }
-  // if (filterValue === "no-discount") {
-  //   filteredValue = cabins.filter((cabin) => cabin.discount === null);
-  //   console.log(filteredValue);
-  // }
-  // if (filterValue === "with-discount") {
-  //   filteredValue = cabins.filter((cabin) => cabin.discount > 0);
-  //   console.log(filteredValue);
-  // }
-  // if (filterValue === "available") {
-  //   filteredValue = cabins.filter((cabin) => cabin.availability === true);
-  //   console.log(filteredValue);
-  // }
-
-  //   SORT
-  //.................................................................................................................................
-  // const sortBy = searchParams.get("sortBy") || "cabin_name-asc";
-  // const [field, direction] = sortBy.split("-");
-
-  // //   const sortedCabins = filteredValue.sort(
-  // //     (a, b) => (a[field] - b[field]) * modifier
-  // //   );
-
-  // const modifier = direction === "asc" ? 1 : -1;
-
-  // const sortedCabins = cabins.sort((a, b) => {
-  //   // Case 1: If sorting by a numeric field (like price_per_night or max_capacity)
-  //   if (typeof a[field] === "number" && typeof b[field] === "number") {
-  //     return (a[field] - b[field]) * modifier;
-  //   }
-
-  //   // Case 2: If sorting by a string field (like cabin_name)
-  //   if (typeof a[field] === "string" && typeof b[field] === "string") {
-  //     if (field === "cabin_name") {
-  //       // Sorting by the first letter of the cabin_name
-  //       const firstCharA = a[field].charAt(0).toLowerCase();
-  //       const firstCharB = b[field].charAt(0).toLowerCase();
-  //       return firstCharA.localeCompare(firstCharB) * modifier;
-  //     }
-
-  //     // Default string comparison for other fields (if needed)
-  //     return a[field].localeCompare(b[field]) * modifier;
-  //   }
-
-  //   // Default case: fallback for unknown types or cases
-  //   return 0;
-  // });
-
   return (
     <Modal>
       <Menus>

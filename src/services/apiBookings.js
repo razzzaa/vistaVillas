@@ -51,8 +51,13 @@ export async function getBookingsById(id) {
   return booking;
 }
 
-export async function addEditBookings(newBooking, id) {
+export async function addEditBookings({
+  newBooking,
+  newBookingGuestsData,
+  id,
+}) {
   console.log(newBooking);
+  console.log(newBookingGuestsData);
 
   if (!id) {
     console.log("no id");
@@ -62,10 +67,31 @@ export async function addEditBookings(newBooking, id) {
       .insert({ ...newBooking })
       .select()
       .single();
-    console.log(booking);
+
     if (error) {
       console.log(error);
     }
+
+    const guestsArray = Object.entries(newBookingGuestsData).map(
+      ([guestId, hasBreakfast]) => ({
+        guests_id: Number(guestId), // Convert guest ID to number
+        bookings_id: booking.id, // Attach new booking ID
+        hasBreakfast: hasBreakfast === "TRUE", // Convert to Boolean
+      })
+    );
+
+    console.log(guestsArray);
+    const { data: guestsBooking, error2 } = await supabase
+      .from("bookings_guests")
+      .insert(guestsArray);
+
+    if (error2) {
+      console.log(error2);
+    }
+
+    console.log(guestsBooking);
+
+    return { booking, guestsBooking };
   }
 
   if (id) {

@@ -1,0 +1,1 @@
+INSERT INTO "public"."settings" ("id", "created_at", "minBookingLength", "maxBookingLength", "maxGuestsPerBooking", "breakfastPrice") VALUES ('1', '2024-10-12 08:31:25.620394+00', '2', '20', '6', '125');

@@ -36,6 +36,8 @@ import useAddBooking from "../features/bookings/useAddBooking";
 import { GrFormPreviousLink } from "react-icons/gr";
 import { useGetAllGuests } from "../features/guests/useGetAllGuests";
 import { IoMdCheckmark } from "react-icons/io";
+import { IoMdEye } from "react-icons/io";
+import { IoMdEyeOff } from "react-icons/io";
 
 const FormContext = createContext();
 
@@ -315,6 +317,7 @@ function Form({
     formState: { errors },
     reset,
     control,
+    watch,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: isEdited ? editData : {},
@@ -334,6 +337,7 @@ function Form({
         settings,
         reset,
         control,
+        watch,
       }}
     >
       <div className="flex max-h-[80vh] w-[100%] overflow-auto p-3">
@@ -637,6 +641,8 @@ function Guests({ style, header }) {
 }
 
 function Login() {
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
   const { handleSubmit, register, errors } = useContext(FormContext);
   const { login, isLoading } = useLogin();
 
@@ -644,6 +650,10 @@ function Login() {
     const { email, password } = data;
     login({ email, password });
   };
+
+  function handleShowPassword() {
+    setPasswordVisible(!passwordVisible);
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -653,10 +663,10 @@ function Login() {
           login to your account
         </Heading>
       </div>
-      <div className="flex justify-center ">
+      <div className="flex justify-center">
         <ul>
-          <li className="flex justify-between m-2">
-            <label className="pr-2" htmlFor="email">
+          <li className="grid grid-cols-3 gap-4 items-center">
+            <label className="text-end" htmlFor="email">
               Email:
             </label>
             <StyledFormInput
@@ -664,24 +674,34 @@ function Login() {
               type="text"
               {...register("email")}
               disabled={isLoading}
+              className="col-span-1"
             />
           </li>
-          <li>
-            <p className="text-red-500 m-2">{errors.email?.message}</p>
-          </li>
+          <p className="text-red-500 m-2 text-center">
+            {errors.email?.message}
+          </p>
 
-          <li className="flex justify-between m-2">
-            <label className="pr-2" htmlFor="password">
+          <li className="grid grid-cols-3 gap-4 items-center">
+            <label className="text-end" htmlFor="password">
               Password:{" "}
             </label>
             <StyledFormInput
               id="password"
-              type="text"
+              type={`${passwordVisible ? "text" : "password"}`}
               {...register("password")}
               disabled={isLoading}
             />
+            <button
+              type="button"
+              onClick={handleShowPassword}
+              className="w-[10%]"
+            >
+              {passwordVisible ? <IoMdEye /> : <IoMdEyeOff />}
+            </button>
           </li>
-          <p className="text-red-500 m-2">{errors.password?.message}</p>
+          <p className="text-red-500 m-2 text-center">
+            {errors.password?.message}
+          </p>
 
           <li>
             <Button

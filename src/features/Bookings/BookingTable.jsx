@@ -11,6 +11,7 @@ import Pagination from "../../ui/Pagination.jsx";
 import { useAllBookings } from "./useAllBookings.js";
 import { useCabinsAll } from "../cabins/useCabinsAll.js";
 import useAddBooking from "./useAddBooking.js";
+import CsvReader from "../../utils/resetData.jsx";
 
 function BookingTable() {
   const { bookings, isLoading, count } = useBookings();

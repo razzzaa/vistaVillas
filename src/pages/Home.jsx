@@ -1,7 +1,6 @@
 import DashboardFilter from "../features/dashboard/DashboardFilter";
 import DashboardLayout from "../features/dashBoard/DashboardLayout";
 import Heading from "../ui/Heading";
-
 function Home() {
   return (
     <>

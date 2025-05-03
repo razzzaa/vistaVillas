@@ -170,3 +170,23 @@ export async function updateNumNights(numNights, id) {
     throw new Error("Cannot update nimber of nights!");
   }
 }
+
+export async function deleteAllBookings() {
+  const { error } = await supabase.from("bookings").delete().gt("id", 0);
+  if (error) {
+    console.error(error);
+    throw new Error("Cannot delete all bookings");
+  }
+}
+
+export async function resetBookings(bookingsData) {
+  const { error } = await supabase.from("bookings").insert(bookingsData);
+  if (error) console.log(error.message);
+}
+
+export async function resetBookingsGuests(bookingsGuestsData) {
+  const { error } = await supabase
+    .from("bookings_guests")
+    .insert(bookingsGuestsData);
+  if (error) console.log(error.message);
+}

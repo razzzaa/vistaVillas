@@ -62,3 +62,16 @@ export async function deleteGuest(id) {
     throw new Error("Cannot delete guest");
   }
 }
+
+export async function deleteAllGuests() {
+  const { error } = await supabase.from("guests").delete().gt("id", 0); // delete all rows
+  if (error) {
+    console.error(error);
+    throw new Error("Cannot delete all guests");
+  }
+}
+
+export async function resetGuests(guestsArray) {
+  const { error } = await supabase.from("guests").insert(guestsArray);
+  if (error) console.log(error.message);
+}

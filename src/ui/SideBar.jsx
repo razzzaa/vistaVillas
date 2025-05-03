@@ -1,3 +1,4 @@
+import CsvReader from "../utils/resetData";
 import Logo from "./Logo";
 import MainSideBarNav from "./MainSideBarNav";
 
@@ -6,6 +7,7 @@ function SideBar() {
     <aside className="row-start-1 row-end-2 h-lvh border-[1px]">
       <Logo />
       <MainSideBarNav />
+      <CsvReader />
     </aside>
   );
 }

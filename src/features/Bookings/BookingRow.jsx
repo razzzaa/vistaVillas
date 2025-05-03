@@ -21,14 +21,16 @@ import { FaLongArrowAltRight } from "react-icons/fa";
 import { FinalPrice } from "../../utils/priceCalculator";
 import useCalcTotalPrice from "./useBookingFinalPrice";
 import useBookingNumNights from "./useBookingNumNights";
+import useAddBooking from "./useAddBooking";
 
 function BookingRow({ booking }) {
   const [expandedGuests, setExpandedGuests] = useState(false);
   const contentRef = useRef(null);
   const { settings } = useSettings();
   const { updateNights } = useBookingNumNights();
-
   const { calcTotalPrice } = useCalcTotalPrice();
+
+  const { addBooking } = useAddBooking();
 
   //DATE
   //................................................................................................................................................................................
@@ -70,6 +72,19 @@ function BookingRow({ booking }) {
     calcTotalPrice({ totalPrice, id });
     updateNights({ numNights, id });
   }, [totalPrice, calcTotalPrice, id, numNights, updateNights]);
+
+  useEffect(() => {
+    if (daysUntilArrival < 0 && booking.status !== "checked_out") {
+      addBooking({
+        newBooking: { status: "checked_out" }, // Only update the status
+        id,
+      });
+    }
+  }, [daysUntilArrival, booking.status, addBooking, id]);
+
+  // if (daysUntilArrival < 1 && status !== "checked_out") {
+  //   console.log(booking);
+  // }
 
   //................................................................................................................................................................................
 

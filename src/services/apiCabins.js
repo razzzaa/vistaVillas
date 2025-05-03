@@ -81,3 +81,16 @@ export async function deleteCabin(id) {
     console.log("success motherfucka!");
   }
 }
+
+export async function deleteAllCabins() {
+  const { error } = await supabase.from("cabins").delete().gt("id", 0);
+  if (error) {
+    console.error(error);
+    throw new Error("Cannot delete all Cabins");
+  }
+}
+
+export async function resetCabins(cabinsData) {
+  const { error } = await supabase.from("cabins").insert(cabinsData);
+  if (error) console.log(error.message);
+}
